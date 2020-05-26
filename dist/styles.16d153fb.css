@@ -1,0 +1,282 @@
+body, html {
+  margin: 0;
+  height: 100%;
+}
+
+section {
+  height: 100%;
+}
+
+main {
+  height: 100%;
+}
+
+#start-btn {
+  position: absolute;
+  opacity: 0;
+  display: inline-block;
+  margin: auto;
+  margin-top: 10vh;
+  padding: 10px;
+  font-size: 2em;
+  background-color: white;
+  border: 2px solid black;
+  transition: background 0.5s ease-in-out, color 0.5s ease-in-out, opacity 1s ease-in-out;
+  text-decoration: none;
+  color: black;
+  right: -50vw;
+}
+
+.link-container {
+  overflow: hidden;
+  position: relative;
+}
+
+#start-btn:hover {
+  background-color: lightgrey;
+}
+
+#title {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 5em;
+  padding-top: 10vh;
+}
+
+.home {
+  height: 100vh;
+  text-align: center;
+  font-family: Cloiser;
+  background-image: url(https://cdn.clipart.email/d4637513f23dee0b46e952f6e690dc45_fire-breathing-dragons-pictures-clip-art-library_1500-864.gif);
+  background-size: 100% 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  background-blend-mode: lighten;
+}
+
+.class-label {
+  font-size: 2em;
+  padding: 10px;
+  border: 1px solid #CCC;
+  cursor: pointer;
+  z-index: 90;
+}
+
+#character-select input[type=button] {
+  padding: 10px;
+  font-size: 2em;
+  font-family: Cloiser;
+  background-color: white;
+  border: 2px solid black;
+  transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+}
+#character-select input[type=button]:hover {
+  background-color: lightgrey;
+}
+#character-select input[type=button]#checked {
+  background-color: black;
+  color: white;
+}
+
+#stoke-fire {
+  display: inline-block;
+  position: relative;
+  margin-top: 10vh;
+  padding: 10px;
+  font-size: 1em;
+  font-family: "Times New Roman", Times, serif;
+  background-color: black;
+  border: 2px solid white;
+  color: white;
+  transition: background 0.5s ease-in-out, color 0.5s ease-in-out, opacity 2s ease-in-out;
+  z-index: 2;
+}
+#stoke-fire:hover {
+  background-color: grey;
+  cursor: pointer;
+}
+#stoke-fire#checked {
+  background-color: black;
+  color: white;
+}
+
+.cooldown {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: -1;
+  height: 100%;
+  background-color: #DDDDDD;
+  text-align: center;
+}
+
+#choose-class {
+  font-size: 2em;
+  font-weight: 700;
+}
+
+.game {
+  top: 0%;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 50%, #272823 50%);
+  background-size: 100% 200%;
+  color: white;
+  overflow: auto;
+}
+
+.title, .game {
+  position: absolute;
+  width: 100%;
+}
+
+.interaction-container {
+  height: 700px;
+  position: relative;
+}
+
+.text-container {
+  width: 300px;
+  height: 700px;
+  top: 20px;
+  left: 0px;
+  position: absolute;
+  overflow: hidden;
+}
+
+.wrapper {
+  margin: auto;
+  width: 800px;
+  position: relative;
+  margin-top: -100vh;
+  padding: 20px 0 0 320px;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+.flame {
+  height: 100px;
+  position: relative;
+  margin-top: 30vh;
+  border-radius: 50%;
+  opacity: 0;
+  z-index: 1.5;
+  transition: opacity 2s ease-in-out, box-shadow 2s ease-in-out;
+  box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.4), 0 0 60px 40px rgba(255, 0, 0, 0.4);
+  /* inner white */
+}
+
+#flame-sm {
+  animation: flame-sm 3s linear infinite alternate;
+  opacity: 0.2;
+}
+
+#flame-md {
+  animation: flame-md 3s linear infinite alternate;
+  opacity: 0.4;
+}
+
+#flame-lg {
+  animation: flame-lg 3s linear infinite alternate;
+  opacity: 0.6;
+}
+
+#flame-xl {
+  animation: flame-xl 3s linear infinite alternate;
+  opacity: 0.8;
+}
+
+.flame-border {
+  background-image: radial-gradient(red, blue, orange);
+}
+
+#intro-fire {
+  height: 50vh;
+}
+
+#intro-btn {
+  height: 50vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.notification {
+  margin-bottom: 10px;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.text-gradient {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(rgba(39, 40, 35, 0) 0%, #272823 100%);
+}
+
+.button-disabled {
+  pointer-events: none;
+}
+
+@keyframes flame-sm {
+  0% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.15), 0 0 60px 40px rgba(255, 0, 0, 0.15);
+    /* inner white */
+  }
+  50% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.2), 0 0 60px 40px rgba(255, 0, 0, 0.2);
+    /* inner white */
+  }
+  100% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.15), 0 0 60px 40px rgba(255, 0, 0, 0.15);
+    /* inner white */
+  }
+}
+@keyframes flame-md {
+  0% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.15), 0 0 60px 40px rgba(255, 0, 0, 0.15);
+    /* inner white */
+  }
+  50% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.3), 0 0 60px 40px rgba(255, 0, 0, 0.2);
+    /* inner white */
+  }
+  100% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.25), 0 0 60px 40px rgba(255, 0, 0, 0.25);
+    /* inner white */
+  }
+}
+@keyframes flame-lg {
+  0% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.15), 0 0 60px 40px rgba(255, 0, 0, 0.15);
+    /* inner white */
+  }
+  50% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.32), 0 0 60px 40px rgba(255, 0, 0, 0.32);
+    /* inner white */
+  }
+  100% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.3), 0 0 60px 40px rgba(255, 0, 0, 0.3);
+    /* inner white */
+  }
+}
+@keyframes flame-xl {
+  0% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.15), 0 0 60px 40px rgba(255, 0, 0, 0.15);
+    /* inner white */
+  }
+  50% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.34), 0 0 60px 40px rgba(255, 0, 0, 0.34);
+    /* inner white */
+  }
+  100% {
+    box-shadow: inset 0 0 60px 20px rgba(255, 0, 0, 0.32), 0 0 60px 40px rgba(255, 0, 0, 0.32);
+    /* inner white */
+  }
+}
+@font-face {
+  font-family: Cloiser;
+  src: url("/CloisterBlack.571567df.ttf") format("truetype");
+}
+
+/*# sourceMappingURL=/styles.16d153fb.css.map */

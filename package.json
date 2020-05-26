@@ -1,0 +1,34 @@
+{
+  "name": "dragon_js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xinyu-123/Defeat-the-Dragon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Xinyu-123/Defeat-the-Dragon/issues"
+  },
+  "homepage": "https://github.com/Xinyu-123/Defeat-the-Dragon#readme",
+  "dependencies": {
+    "@dogstudio/highway": "^2.2.1",
+    "gsap": "^3.2.6",
+    "jquery": "^3.5.1",
+    "jsdom": "^16.2.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.1.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "sass": "^1.26.5"
+  }
+}

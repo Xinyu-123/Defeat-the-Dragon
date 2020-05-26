@@ -1,0 +1,115 @@
+* {
+    box-sizing: border-box;
+}
+body, html {
+    margin: 0;
+    max-height: 100vh;
+}
+
+section {
+    height: 100%;
+}
+
+main {
+    height: 100%;
+}
+#start-btn {
+    position: absolute;
+    opacity: 0;
+    display: inline-block;
+    margin: auto;
+    margin-top: 10vh;
+    padding: 10px;
+    font-size: 2em;
+    background-color: white;
+    border: 2px solid black;
+    transition: background 0.5s ease-in-out, color 0.5s ease-in-out, opacity 1s ease-in-out;
+    text-decoration: none;
+    color: black;
+    right: -50vw;
+}
+
+.link-container {
+    overflow: hidden;
+    position: relative;
+}
+
+#start-btn:hover{
+    background-color: lightgrey;
+}
+
+#title {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 5em;
+    padding-top: 10vh;
+}
+
+.home {
+    height: 100vh;
+    text-align: center;
+    font-family: Cloiser;
+    background-image: url(https://cdn.clipart.email/d4637513f23dee0b46e952f6e690dc45_fire-breathing-dragons-pictures-clip-art-library_1500-864.gif);
+    background-size: 100% 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    background-blend-mode: lighten;
+}
+
+.class-label {
+    font-size: 2em;
+    padding: 10px;
+    border: 1px solid #CCC;
+    cursor: pointer;
+    z-index: 90;
+}
+
+
+#character-select input[type='button']{
+    padding: 10px;
+    font-size: 2em;
+    font-family: Cloiser;
+    background-color: white;
+    border: 2px solid black;
+    transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+}
+
+
+#character-select input[type='button']:hover{
+    background-color: lightgrey;
+}
+
+#character-select input[type='button'][id='checked'] {
+    background-color: black;
+    color: white;
+}
+
+#choose-class {
+    font-size: 2em;
+    font-weight: 700;
+}
+
+
+
+.game {
+    position: absolute;
+    top: 0%;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0) 50%, black 50%);
+    background-size: 100% 200%;
+    color: white;
+}
+
+.title, .game {
+    position: absolute;
+    width:100%;
+}
+
+
+@font-face {
+    font-family: Cloiser;
+    src: url('/CloisterBlack.571567df.ttf') format("truetype");
+}
+
+
+/*# sourceMappingURL=/styles.68af2ffd.css.map */

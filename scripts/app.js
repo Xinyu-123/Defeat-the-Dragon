@@ -1,11 +1,59 @@
+import Highway from '@dogstudio/highway';
+import Fade from './transition';
+import Character from './Character';
+import Player from './Player'
+import Button from './Button';
+import $ from 'jquery'
+
 let start_btn = document.getElementById('start-btn');
 let character_form = document.getElementById('character-select')
+let STOKE_COOLDOWN = 2;
+export let player;
 
-start_btn.addEventListener('click', () => {
-    let val = getCharacterVal(character_form, 'class');
-    
-    console.log(`You've started Your Adventure as a ${val}`)
+start_btn.addEventListener('click', async () => {
+    let character_class = getCharacterVal(character_form, 'class');
+    let type = await character_class;
+    // console.log({type});
+    // console.log(`You've started Your Adventure as a ${type}`);
+    player = new Player({
+                        class: type,
+                        attack: 5,
+                        defence: 5,
+                        weapon: "Shortsword",
+                        health: 1
+                         });
+
+    console.log(player);
 })
+
+
+export function updateFlame() {
+    let flame = $('.flame');
+    let health = player._health;
+    console.log(flame);
+    
+    console.log('health: ' + health)
+    
+    flame.on('webkitAnimationIteration mozAnimationIteration AnimationIteration', function() {
+        if(health < 25){
+            flame.attr('id', 'flame-sm');
+            flame.attr('opacity', '0.2');
+        }
+        if(health < 50 && health >= 25){
+            flame.attr('id', 'flame-md');
+            flame.attr('style', 'opacity: 0.4');
+        }
+        if(health < 75 && health >= 50){
+            flame.attr('id', 'flame-lg');
+            flame.attr('style', 'opacity: 0.6');
+        }
+        if(health >= 75){
+            flame.attr('id', 'flame-xl');
+            flame.attr('style', 'opacity: 0.8');
+        }
+    });
+    
+}
 
 function getCharacterVal(form, name) {
     let val;
@@ -30,9 +78,26 @@ let displaySubmit = () => {
                 ele.removeAttribute('id')
             })
             element.setAttribute("id", "checked");
+            start_btn.style.position = "initial";
+            start_btn.style.right = 0;
             start_btn.style.opacity = 1;
         })
     });
 }
+
+export let stoke_fire = () => {
+    document.getElementById('stoke-fire').addEventListener('click', () => {
+        document.getElementsByClassName('wrapper')[0].style.display = 'block';
+    })
+}
+
+const H = new Highway.Core({
+    transitions: {
+        default: Fade
+    }
+})
+
+// let stoke_fire_btn = new Button('stokefire', 'stoke fire', STOKE_COOLDOWN).appendTo('div#intro-btn');
+
 
 displaySubmit();
