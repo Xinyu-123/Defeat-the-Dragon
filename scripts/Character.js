@@ -6,6 +6,7 @@ class Character {
         this._defence = options.defence;
         this._weapon = new Weapon(options.weapon);
         this._health = options.health
+        this._level = options.level;
     }
 
     get type() {
@@ -54,6 +55,14 @@ class Character {
 
     set attack_delay(delay) {
         this._attack_delay = delay;
+    }
+
+    get level(){
+        return this._level;
+    }
+
+    set level(level) {
+        this._level = level;
     }
     /* Needed functions
     - Class type

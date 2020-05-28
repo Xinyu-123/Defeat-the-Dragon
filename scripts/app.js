@@ -20,7 +20,8 @@ start_btn.addEventListener('click', () => {
                         attack: 5,
                         defence: 5,
                         weapon: "Shortsword",
-                        health: 1
+                        health: 1,
+                        level: 1
                          });
 
     console.log(player);

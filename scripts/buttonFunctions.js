@@ -1,18 +1,18 @@
 import * as app from './app';
-import * as Notis from './notification';
 import Character from './Character';
 import $ from 'jquery';
 import Button from './Button';
-let page = require('./gamepage');
 
+const page = require('./gamepage');
+const Weapon = require('./Weapons');
+const noti = require('./notification')
+const Util = require('./Utility');
 module.exports = {
     stoke_fire: function() {
-
-        console.log(app.player);
         app.player._health += 25;
         module.exports.healthBound();
 
-        var text = $('<div>').addClass('notification').css('opacity', '0').text(Notis.stoke_flame(app.player._health)).prependTo('div.text-container');
+        var text = $('<div>').addClass('notification').css('opacity', '0').text(noti.stoke_flame(app.player._health)).prependTo('div.text-container');
         text.animate({opacity: 1}, 100, 'linear', function() {
             //clear the overflowed notifications
          });
@@ -25,32 +25,6 @@ module.exports = {
      
     },
     
-    
-
-    // updateFlame: function() {
-    //     let flame = $('.flame');
-    //     let health = app.player._health;
-        
-    //      //Change the flame's opacity and animation to reflect the players health
-    //      flame.on('webkitAnimationIteration mozAnimationIteration AnimationIteration', function() {
-    //         if(health < 25){
-    //             flame.attr('id', 'flame-sm');
-    //             flame.attr('opacity', '0.1');
-    //         }
-    //         if(health < 50 && health >= 25){
-    //             flame.attr('id', 'flame-md');
-    //             flame.attr('style', 'opacity: 0.4');
-    //         }
-    //         if(health < 75 && health >= 50){
-    //             flame.attr('id', 'flame-lg');
-    //             flame.attr('style', 'opacity: 0.7');
-    //         }
-    //         if(health >= 75){
-    //             flame.attr('id', 'flame-xl');
-    //             flame.attr('style', 'opacity: 1');
-    //         }
-    //     });
-    // },
 
     healthBound: function() {
         if(app.player._health > 100){
@@ -59,7 +33,47 @@ module.exports = {
     },
 
     attack_btn: function(options) {
+        let player = app.player;
+        let enemy = page.enemy;
+        let defence = enemy._defence;
+        let attack = player._attack + player._weapon._attack;
+        attack = module.exports.getAttack(attack) - defence;
+        enemy._health -= attack;
 
+        //notification
+        var text = $('<div>').addClass('notification').css('opacity', '0').text(noti.att_noti({player, attack, enemy})).prependTo('div.text-container');
+        text.animate({opacity: 1}, 100, 'linear', function() {
+            //clear the overflowed notifications
+         });
+
+
+        page.defeatEnemy(enemy);
+    },
+
+    defend_btn: function() {
+        
+    },
+
+    getAttack: function (attack) {
+        let roll = Util.getRandomInt(5);
+
+        switch (roll){
+            case 0:
+                return Math.floor(attack - (attack * 0.25));
+                break;
+            case 1:
+                return Math.floor(attack - (attack * 0.1));
+                break;
+            case 2:
+                return Math.floor(attack);
+                break;
+            case 3:
+                return Math.floor(attack + (attack * 0.1));
+                break; 
+            case 4:
+                return Math.floor(attack + (attack * 0.25));
+                break;
+        }
     }
     
 }

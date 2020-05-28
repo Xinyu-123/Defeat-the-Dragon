@@ -6009,7 +6009,8 @@ var Weapon = /*#__PURE__*/function () {
   function Weapon(name) {
     _classCallCheck(this, Weapon);
 
-    this._name = name; // this._attack = getWeaponAttack(name);
+    this._name = name;
+    this._attack = this.getWeaponAttack(name); // this._attack = getWeaponAttack(name);
     // this._class = getWeaponClass(name);
   }
 
@@ -6055,6 +6056,7 @@ var Character = /*#__PURE__*/function () {
     this._defence = options.defence;
     this._weapon = new _Weapons.default(options.weapon);
     this._health = options.health;
+    this._level = options.level;
   }
 
   _createClass(Character, [{
@@ -6104,6 +6106,14 @@ var Character = /*#__PURE__*/function () {
     },
     set: function set(delay) {
       this._attack_delay = delay;
+    }
+  }, {
+    key: "level",
+    get: function get() {
+      return this._level;
+    },
+    set: function set(level) {
+      this._level = level;
     }
     /* Needed functions
     - Class type
@@ -17258,13 +17268,22 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{"process":"../../../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../scripts/notification.js":[function(require,module,exports) {
+},{"process":"../../../../../../../AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/process/browser.js"}],"../scripts/Utility.js":[function(require,module,exports) {
+module.exports = {
+  getRandomInt: function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
+};
+},{}],"../scripts/notification.js":[function(require,module,exports) {
+var app = require('./app');
+
 var $ = require('jquery');
+
+var util = require('./Utility');
 
 module.exports = {
   stoke_flame: function stoke_flame(health) {
     var texts = [];
-    console.log('health ' + health);
     texts.push('You stoke the flame. The flame is small');
     texts.push('You stoke the flame. The flame is glowing');
     texts.push('You stoke the flame. The flame flickers');
@@ -17278,32 +17297,28 @@ module.exports = {
 
     switch (true) {
       case health >= 25 && health < 50:
-        console.log('1');
-        return texts[getRandomInt(3)];
+        return texts[util.getRandomInt(3)];
         break;
 
       case health >= 50 && health < 75:
-        console.log('2');
-        return texts[getRandomInt(4) + 3];
+        return texts[util.getRandomInt(4) + 3];
         break;
 
       case health >= 75:
-        console.log('3');
-        return texts[getRandomInt(3) + 7];
+        return texts[util.getRandomInt(3) + 7];
         break;
 
       default:
-        console.log('????');
-        return texts[getRandomInt(3)];
+        return texts[util.getRandomInt(3)];
         break;
     }
-  }
+  },
+  att_noti: function att_noti(options) {
+    return "You attacked the ".concat(options.enemy._type, " with your ").concat(options.player._weapon._name, " and did ").concat(options.attack, " damage.");
+  },
+  def_noti: function def_noti() {}
 };
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
-},{"jquery":"../node_modules/jquery/dist/jquery.js"}],"../scripts/Enemy.js":[function(require,module,exports) {
+},{"./app":"../scripts/app.js","jquery":"../node_modules/jquery/dist/jquery.js","./Utility":"../scripts/Utility.js"}],"../scripts/Enemy.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17362,8 +17377,6 @@ exports.default = Enemy;
 
 var app = _interopRequireWildcard(require("./app"));
 
-var Notis = _interopRequireWildcard(require("./notification"));
-
 var _Character = _interopRequireDefault(require("./Character"));
 
 var _jquery = _interopRequireDefault(require("jquery"));
@@ -17378,49 +17391,75 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var page = require('./gamepage');
 
+var Weapon = require('./Weapons');
+
+var noti = require('./notification');
+
+var Util = require('./Utility');
+
 module.exports = {
   stoke_fire: function stoke_fire() {
-    console.log(app.player);
     app.player._health += 25;
     module.exports.healthBound();
-    var text = (0, _jquery.default)('<div>').addClass('notification').css('opacity', '0').text(Notis.stoke_flame(app.player._health)).prependTo('div.text-container');
+    var text = (0, _jquery.default)('<div>').addClass('notification').css('opacity', '0').text(noti.stoke_flame(app.player._health)).prependTo('div.text-container');
     text.animate({
       opacity: 1
     }, 100, 'linear', function () {//clear the overflowed notifications
     });
     page.updateFlame();
   },
-  // updateFlame: function() {
-  //     let flame = $('.flame');
-  //     let health = app.player._health;
-  //      //Change the flame's opacity and animation to reflect the players health
-  //      flame.on('webkitAnimationIteration mozAnimationIteration AnimationIteration', function() {
-  //         if(health < 25){
-  //             flame.attr('id', 'flame-sm');
-  //             flame.attr('opacity', '0.1');
-  //         }
-  //         if(health < 50 && health >= 25){
-  //             flame.attr('id', 'flame-md');
-  //             flame.attr('style', 'opacity: 0.4');
-  //         }
-  //         if(health < 75 && health >= 50){
-  //             flame.attr('id', 'flame-lg');
-  //             flame.attr('style', 'opacity: 0.7');
-  //         }
-  //         if(health >= 75){
-  //             flame.attr('id', 'flame-xl');
-  //             flame.attr('style', 'opacity: 1');
-  //         }
-  //     });
-  // },
   healthBound: function healthBound() {
     if (app.player._health > 100) {
       app.player._health = 100;
     }
   },
-  attack_btn: function attack_btn(options) {}
+  attack_btn: function attack_btn(options) {
+    var player = app.player;
+    var enemy = page.enemy;
+    var defence = enemy._defence;
+    var attack = player._attack + player._weapon._attack;
+    attack = module.exports.getAttack(attack) - defence;
+    enemy._health -= attack; //notification
+
+    var text = (0, _jquery.default)('<div>').addClass('notification').css('opacity', '0').text(noti.att_noti({
+      player: player,
+      attack: attack,
+      enemy: enemy
+    })).prependTo('div.text-container');
+    text.animate({
+      opacity: 1
+    }, 100, 'linear', function () {//clear the overflowed notifications
+    });
+    page.defeatEnemy(enemy);
+  },
+  defend_btn: function defend_btn() {},
+  getAttack: function getAttack(attack) {
+    var roll = Util.getRandomInt(5);
+
+    switch (roll) {
+      case 0:
+        return Math.floor(attack - attack * 0.25);
+        break;
+
+      case 1:
+        return Math.floor(attack - attack * 0.1);
+        break;
+
+      case 2:
+        return Math.floor(attack);
+        break;
+
+      case 3:
+        return Math.floor(attack + attack * 0.1);
+        break;
+
+      case 4:
+        return Math.floor(attack + attack * 0.25);
+        break;
+    }
+  }
 };
-},{"./app":"../scripts/app.js","./notification":"../scripts/notification.js","./Character":"../scripts/Character.js","jquery":"../node_modules/jquery/dist/jquery.js","./Button":"../scripts/Button.js","./gamepage":"../scripts/gamepage.js"}],"../scripts/gamepage.js":[function(require,module,exports) {
+},{"./app":"../scripts/app.js","./Character":"../scripts/Character.js","jquery":"../node_modules/jquery/dist/jquery.js","./Button":"../scripts/Button.js","./gamepage":"../scripts/gamepage.js","./Weapons":"../scripts/Weapons.js","./notification":"../scripts/notification.js","./Utility":"../scripts/Utility.js"}],"../scripts/gamepage.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17433,15 +17472,14 @@ exports.updateFlame = updateFlame;
 exports.updateScreen1 = updateScreen1;
 exports.updateScreen2 = updateScreen2;
 exports.updateScreen3 = updateScreen3;
-exports.stoke_btn = exports.enemy = void 0;
+exports.updateScreen4 = updateScreen4;
+exports.def_btn = exports.att_btn = exports.stoke_btn = exports.enemy = void 0;
 
 var _notification = _interopRequireDefault(require("./notification"));
 
 var _Button = _interopRequireDefault(require("./Button"));
 
 var _Enemy = _interopRequireDefault(require("./Enemy"));
-
-var ButtonFunc = _interopRequireWildcard(require("./buttonFunctions"));
 
 var _jquery = _interopRequireDefault(require("jquery"));
 
@@ -17453,10 +17491,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var ButtonFunc = require('./buttonFunctions');
+
 var enemy;
 exports.enemy = enemy;
 var stoke_btn;
 exports.stoke_btn = stoke_btn;
+var att_btn;
+exports.att_btn = att_btn;
+var def_btn;
+exports.def_btn = def_btn;
 
 function setUpGame() {
   setTimeout(function () {
@@ -17466,26 +17510,31 @@ function setUpGame() {
   }, 500); //Replace all of this by calling a new module that will create the game state
 
   setTimeout(function () {
-    exports.stoke_btn = stoke_btn = new _Button.default('stoke-fire', 'stoke fire', [ButtonFunc.stoke_fire, updateScreen1], 2);
-
-    stoke_btn._element.appendTo('div#intro-btn');
-
-    (0, _jquery.default)(stoke_btn._element).animate({
-      opacity: 0.5
-    }, 2000, 'linear');
+    exports.stoke_btn = stoke_btn = new _Button.default({
+      id: 'stoke-fire',
+      text: 'stoke fire',
+      click_events: [ButtonFunc.stoke_fire, updateScreen1],
+      cooldown: 2
+    });
+    (0, _jquery.default)(stoke_btn._element).hide().appendTo('div#intro-btn').fadeIn(2000);
 
     _notification.default.stoke_flame();
   }, 4000);
 }
 
 function createEnemy(options) {
-  exports.enemy = enemy = new _Enemy.default(options);
-  console.log('im at the createEnemy()'); // $('.interaction-container').hide().appendTo(enemy._element).fadeIn(1000);
+  exports.enemy = enemy = new _Enemy.default(options); // $('.interaction-container').hide().appendTo(enemy._element).fadeIn(1000);
 
   (0, _jquery.default)(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
 }
 
-function defeatEnemy(enemy) {}
+function defeatEnemy(enemy) {
+  console.log(enemy);
+
+  if (enemy._health <= 0) {
+    console.log("you have defeated ".concat(enemy._type));
+  }
+}
 
 function updateFlame() {
   var flame = (0, _jquery.default)('.flame');
@@ -17519,7 +17568,6 @@ function updateFlame() {
 
 function updateScreen1() {
   if (app.player._health == 100) {
-    console.log(stoke_btn);
     (0, _jquery.default)('.interaction-container').css('border-color', 'rgba(255,255,255,0.5)');
     updateScreen2();
     (0, _jquery.default)(stoke_btn._element).off('click', updateScreen1);
@@ -17565,6 +17613,29 @@ function updateScreen3() {
   });
 
   enemy._element.hide().appendTo(container).delay(2000).fadeIn(2000);
+
+  updateScreen4();
+}
+
+function updateScreen4() {
+  var container = (0, _jquery.default)('.interaction-container');
+  exports.att_btn = att_btn = new _Button.default({
+    id: 'attack-btn',
+    text: 'attack',
+    click_events: [ButtonFunc.attack_btn],
+    cooldown: 3,
+    width: 60
+  });
+  exports.def_btn = def_btn = new _Button.default({
+    id: 'defence-btn',
+    text: 'defend',
+    click_events: [ButtonFunc.defend_btn],
+    cooldown: 3,
+    width: 60
+  });
+  var cont = (0, _jquery.default)("<div>").addClass('battle-options-container').appendTo(container);
+  (0, _jquery.default)(att_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
+  (0, _jquery.default)(def_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
 } // player = new Player({
 //     class: type,
 //     attack: 5,
@@ -17572,7 +17643,7 @@ function updateScreen3() {
 //     weapon: "Shortsword",
 //     health: 1
 //      });
-},{"./notification":"../scripts/notification.js","./Button":"../scripts/Button.js","./Enemy":"../scripts/Enemy.js","./buttonFunctions":"../scripts/buttonFunctions.js","jquery":"../node_modules/jquery/dist/jquery.js","./app":"../scripts/app.js"}],"../scripts/Button.js":[function(require,module,exports) {
+},{"./notification":"../scripts/notification.js","./Button":"../scripts/Button.js","./Enemy":"../scripts/Enemy.js","jquery":"../node_modules/jquery/dist/jquery.js","./app":"../scripts/app.js","./buttonFunctions":"../scripts/buttonFunctions.js"}],"../scripts/Button.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17597,18 +17668,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var $ = require('jquery');
 
-var Button = function Button(id, text, click_events, cooldown, width) {
+var Button = function Button(options) {
   var _this = this;
 
   _classCallCheck(this, Button);
 
-  console.log("button created");
-  this._id = id;
-  this._text = text;
-  this._click_events = click_events;
-  this._cooldown = cooldown;
+  this._id = options.id;
+  this._text = options.text;
+  this._click_events = options.click_events;
+  this._cooldown = options.cooldown;
   this._disabled = false;
-  var el = $('<div>').attr('id', this._id).attr('type', 'button').text(this._text).addClass('button').css('opacity', '0').click(function () {
+  var el = $('<div>').attr('id', this._id).attr('type', 'button').text(this._text).addClass('button').click(function () {
     if (!$(_this).hasClass('disabled')) {
       $('#' + _this._id).attr('class', 'button-disabled');
       startcooldown($(_this));
@@ -17616,9 +17686,12 @@ var Button = function Button(id, text, click_events, cooldown, width) {
   });
   this._element = el;
 
-  for (var i = 0; i < click_events.length; i++) {
-    console.log(click_events[i]);
-    el.on('click', click_events[i]);
+  for (var i = 0; i < this._click_events.length; i++) {
+    el.on('click', this._click_events[i]);
+  }
+
+  if (options.width) {
+    el.css('width', options.width);
   }
 
   var cd = $('<div>').addClass('cooldown');
@@ -17626,11 +17699,12 @@ var Button = function Button(id, text, click_events, cooldown, width) {
 };
 
 function startcooldown(btn, option) {
+  console.log(btn);
   var cd = btn[0]._cooldown;
   var start = cd,
       left = 1;
   var time = start;
-  $('div.cooldown').width(left * 100 + "%").animate({
+  $('div#' + btn[0]._id + ' > div.cooldown').width(left * 100 + "%").animate({
     width: '0%'
   }, time * 1000, 'linear', function () {
     clearCooldown(btn, true);
@@ -17645,10 +17719,7 @@ function clearCooldown(btn, ended) {
 }
 
 function getBtnFunction(id) {
-  console.log(id);
-
   if (id == 'stoke-fire') {
-    console.log('here');
     app.player._health += 25;
   }
 
@@ -17790,7 +17861,8 @@ start_btn.addEventListener('click', function () {
     attack: 5,
     defence: 5,
     weapon: "Shortsword",
-    health: 1
+    health: 1,
+    level: 1
   });
   console.log(player);
 });
@@ -17864,7 +17936,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50099" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55626" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,16 +1,19 @@
 import Noti from './notification';
 import Button from './Button';
 import Enemy from './Enemy';
-import * as ButtonFunc from './buttonFunctions'
+
 import $ from 'jquery';
 import * as app from './app';
 
+const ButtonFunc = require('./buttonFunctions');
 
 export let enemy;
-export let stoke_btn
-
+export let stoke_btn;
+export let att_btn;
+export let def_btn;
 
 export function setUpGame() {
+
     setTimeout(() => {
         $('.flame').animate({opacity: 0.2}, 1000, 'linear');
 
@@ -19,11 +22,16 @@ export function setUpGame() {
     //Replace all of this by calling a new module that will create the game state
 
     setTimeout(() => {
-        stoke_btn = new Button('stoke-fire', 'stoke fire', [ButtonFunc.stoke_fire, updateScreen1], 2);
-        stoke_btn._element.appendTo('div#intro-btn');
-        $(stoke_btn._element).animate({opacity: 0.5}, 2000, 'linear')
+        stoke_btn = new Button({
+            id: 'stoke-fire',
+            text: 'stoke fire',
+            click_events: [ButtonFunc.stoke_fire, updateScreen1],
+            cooldown: 2
+        });
+
+        $(stoke_btn._element).hide().appendTo('div#intro-btn').fadeIn(2000);
         Noti.stoke_flame()
-        
+
     }, 4000);
 
 
@@ -31,13 +39,16 @@ export function setUpGame() {
 
 export function createEnemy(options){
     enemy = new Enemy(options);
-    console.log('im at the createEnemy()')
     // $('.interaction-container').hide().appendTo(enemy._element).fadeIn(1000);
     $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
 }
 
 export function defeatEnemy(enemy){
-
+    console.log(enemy);
+    if(enemy._health <= 0){
+        console.log(`you have defeated ${enemy._type}`);
+    }
+    
 }
 
 export function updateFlame() {
@@ -72,7 +83,6 @@ export function updateFlame() {
 export function updateScreen1(){
 
     if(app.player._health == 100){
-        console.log(stoke_btn)
         $('.interaction-container').css('border-color', 'rgba(255,255,255,0.5)');
 
         updateScreen2();
@@ -116,6 +126,34 @@ export function updateScreen3() {
     })
 
     enemy._element.hide().appendTo(container).delay(2000).fadeIn(2000);
+
+    updateScreen4();
+}
+
+export function updateScreen4() {
+    let container = $('.interaction-container')
+    att_btn = new Button({
+        id: 'attack-btn',
+        text: 'attack',
+        click_events: [ButtonFunc.attack_btn],
+        cooldown: 3,
+        width: 60
+    });
+
+    def_btn = new Button({
+        id: 'defence-btn',
+        text: 'defend',
+        click_events: [ButtonFunc.defend_btn],
+        cooldown: 3,
+        width: 60
+    });
+
+    let cont = $("<div>").addClass('battle-options-container').appendTo(container);
+
+    $(att_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
+
+    $(def_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
+    
 }
 
 // player = new Player({

@@ -77,26 +77,68 @@ main {
   color: white;
 }
 
-#stoke-fire {
+div.button {
   display: inline-block;
+  text-align: center;
   position: relative;
-  margin-top: 15%;
   padding: 10px;
   font-size: 1em;
-  font-family: "Times New Roman", Times, serif;
+  z-index: 2;
   background-color: black;
+  font-family: "Times New Roman", Times, serif;
   border: 2px solid white;
   color: white;
+  opacity: 0.5;
   transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
-  z-index: 2;
+  vertical-align: middle;
 }
-#stoke-fire:hover {
+div.button:hover {
   background-color: grey;
   cursor: pointer;
 }
-#stoke-fire#checked {
+
+.button-disabled {
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  padding: 10px;
+  font-size: 1em;
+  z-index: 2;
   background-color: black;
+  font-family: "Times New Roman", Times, serif;
+  border: 2px solid white;
   color: white;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#stoke-fire {
+  margin-top: 15%;
+}
+
+.battle-options-container {
+  bottom: 50px;
+  display: flex;
+  align-items: flex-end;
+  position: absolute;
+  width: 100%;
+  flex-wrap: nowrap;
+  justify-content: center;
+  height: auto;
+}
+
+#attack-btn {
+  order: 1;
+  flex: 1 1 auto;
+  margin: 0px 30px;
+  padding: 20px;
+}
+
+#defence-btn {
+  order: 2;
+  flex: 1 1 auto;
+  margin: 0px 30px;
+  padding: 20px;
 }
 
 .cooldown {
@@ -215,10 +257,6 @@ main {
   height: 100%;
   width: 100%;
   background: linear-gradient(rgba(39, 40, 35, 0) 0%, #272823 100%);
-}
-
-.button-disabled {
-  pointer-events: none;
 }
 
 .enemy {

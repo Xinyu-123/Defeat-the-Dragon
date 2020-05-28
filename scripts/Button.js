@@ -4,12 +4,11 @@ import * as page from './gamepage';
 import Player from './Player';
 
 class Button {
-    constructor(id, text, click_events, cooldown, width){
-        console.log("button created")
-        this._id = id;
-        this._text = text;
-        this._click_events = click_events;
-        this._cooldown = cooldown;
+    constructor(options){
+        this._id = options.id;
+        this._text = options.text;
+        this._click_events = options.click_events;
+        this._cooldown = options.cooldown;
         this._disabled = false;
 
 
@@ -18,7 +17,6 @@ class Button {
             .attr('type', 'button')
             .text(this._text)
             .addClass('button')
-            .css('opacity', '0')
             .click(() => {
                 if(!$(this).hasClass('disabled')) {
                     $('#' + this._id).attr('class', 'button-disabled');
@@ -28,9 +26,12 @@ class Button {
 
         this._element = el;
 
-        for(let i = 0; i < click_events.length; i++){
-            console.log(click_events[i])
-            el.on('click', click_events[i]);
+        for(let i = 0; i < this._click_events.length; i++){
+            el.on('click', this._click_events[i]);
+        }
+
+        if(options.width){
+            el.css('width', options.width);
         }
 
 
@@ -44,13 +45,14 @@ class Button {
 }
 
 function startcooldown(btn, option) {
+    console.log(btn);
     var cd = btn[0]._cooldown
     
     let start = cd, left = 1;
 
     let time = start;
 
-    $('div.cooldown').width(left * 100 +"%").animate({width: '0%'}, time * 1000, 'linear', function() {
+    $('div#' + btn[0]._id + ' > div.cooldown').width(left * 100 +"%").animate({width: '0%'}, time * 1000, 'linear', function() {
         clearCooldown(btn, true);
     });
 
@@ -67,9 +69,7 @@ function clearCooldown(btn, ended) {
 }
 
 export function getBtnFunction(id) {
-    console.log(id)
     if(id == 'stoke-fire'){
-        console.log('here')
         app.player._health += 25;
     }
 
