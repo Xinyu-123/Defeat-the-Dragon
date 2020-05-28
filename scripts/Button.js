@@ -1,12 +1,14 @@
 var $ = require('jquery');
 import * as app from './app';
+import * as page from './gamepage';
 import Player from './Player';
+
 class Button {
-    constructor(id, text, click, cooldown, width){
+    constructor(id, text, click_events, cooldown, width){
         console.log("button created")
         this._id = id;
         this._text = text;
-        this._click = click;
+        this._click_events = click_events;
         this._cooldown = cooldown;
         this._disabled = false;
 
@@ -22,79 +24,47 @@ class Button {
                     $('#' + this._id).attr('class', 'button-disabled');
                     startcooldown($(this));
 				}
-            })
-            .click(() => {
-                getBtnFunction(this._id)
-            })
-            .data('cooldown', this._cooldown)
-            .data('remaining', 0);
+            });
+
+        this._element = el;
+
+        for(let i = 0; i < click_events.length; i++){
+            console.log(click_events[i])
+            el.on('click', click_events[i]);
+        }
+
 
         let cd = $('<div>').addClass('cooldown');
         el.append(cd);
 
     
         // document.getElementById('stoke-fire').setAttribute('class', 'button-disabled');
-
-        return el;
     }
-
-
-
 
 }
 
-async function startcooldown(btn, option) {
+function startcooldown(btn, option) {
     var cd = btn[0]._cooldown
-
-    var id = 'cooldown.'+ btn.attr('id');
     
     let start = cd, left = 1;
-    // if(cd > 0){
-    //     switch(option){
-    //         // a switch will allow for several uses of cooldown function
-    //         case 'state':
-    //             start = Math.min($SM.get(id), cd);
-    //             left = (start / cd).toFixed(4);
-    //             break;
-    //         default:
-    //             start = cd;
-    //             left = 1;
-    //     }
-    // }
-    
-    // clearCooldown(btn);
-
-  
 
     let time = start;
 
     $('div.cooldown').width(left * 100 +"%").animate({width: '0%'}, time * 1000, 'linear', function() {
-        btn[0]._disabled = false;
-        $('#' + btn[0]._id).attr('class', 'button')
-        // clearCooldown(btn, true);
+        clearCooldown(btn, true);
     });
 
     
 
     btn[0]._disabled = true;
-    // btn.data('onCooldown', true);
 }
 
-// function clearCooldown(btn, ended) {
-//     var ended = ended || false;
-//     if(!ended){
-//         $('div.cooldown', btn).stop(true, true);
-//     }
-//     btn.data('onCooldown', false);
-//     if(btn[0]._cooldown){
-//         window.clearInterval(btn.data('countdown'));
-//         $('div.cooldown', btn).remove('cooldown.'+ btn.attr('id'));
-//         btn.removeData('countdown');
-//     }
-//     if(!btn.data('disabled')) {
-//         btn.removeClass('disabled');
-//     }
-// }
+function clearCooldown(btn, ended) {
+    var button = $('#' + btn[0]._id);
+    btn[0]._disabled = false;
+    button.attr('class' , 'button');
+
+}
 
 export function getBtnFunction(id) {
     console.log(id)

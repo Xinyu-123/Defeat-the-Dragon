@@ -87,14 +87,14 @@ main {
 #stoke-fire {
     display: inline-block;
     position: relative;
-    margin-top: 10vh;
+    margin-top: 15%;
     padding: 10px;
     font-size: 1em;
     font-family: "Times New Roman", Times, serif;
     background-color: black;
     border: 2px solid white;
     color: white;
-    transition: background 0.5s ease-in-out, color 0.5s ease-in-out, opacity 2s ease-in-out;
+    transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
     z-index: 2;
     &:hover {
         background-color: grey;
@@ -141,40 +141,48 @@ main {
 }
 
 .interaction-container {
-    height: 700px;
-    // border: 2px solid rgba( white, 0.5);
+    height: 650px;
+    border: 1px solid transparent;
+    transition: border 2s ease-in-out;
     position: relative;
 }
 
 .text-container {
     width: 300px;
-    height: 700px;
-    top: 20px;
+    height: 350px;
+    top: 10px;
     left: 0px;
     // border: 1px solid rgba(white, 0.6);
     position: absolute;
     overflow: hidden;
 }
 
+.items-container {
+    width: 300px;
+    height: 300px;
+    // border: 1px solid white;
+    top: 350px;
+    left: 0px;
+    position: absolute;
+}
+
 .wrapper {
     margin: auto;
     width: 800px;
     position:relative;
-    margin-top: -100vh;
-    padding: 20px 0 0 320px;
+    padding: 10px 0 0 320px;
     // border: 1px solid red;
-    opacity: 0;
     transition: opacity 2s ease-in-out;
 }
 
 .flame{
     height: 100px;
     position: relative;
-    margin-top: 30vh;
+    margin-top: 22%;
     border-radius: 50%;
     opacity: 0;
     z-index: 1.5;
-    transition: opacity 2s ease-in-out, box-shadow 2s ease-in-out;
+    transition: opacity 1s ease-in-out, box-shadow 2s ease-in-out;
     
     box-shadow:
         inset 0 0 60px 20px rgba($color: red, $alpha: 0.4),  /* inner white */
@@ -182,37 +190,38 @@ main {
 }
 
 #flame-sm{
-    animation: flame-sm 3s linear infinite alternate;
+    animation: flame-sm 2s linear infinite alternate;
     opacity: 0.2;
 }
 
 #flame-md{
-    animation: flame-md 3s linear infinite alternate;
+    animation: flame-md 2s linear infinite alternate;
     opacity: 0.4;
 }
 
 #flame-lg{
-    animation: flame-lg 3s linear infinite alternate;
+    animation: flame-lg 2s linear infinite alternate;
     opacity: 0.6;
 }
 
 #flame-xl{
-    animation: flame-xl 3s linear infinite alternate;
+    animation: flame-xl 2s linear infinite alternate;
     opacity: 0.8
 }
 
 .flame-border {
     background-image: radial-gradient(red, blue, orange);
+    
 }
 
 #intro-fire{
-    height: 50vh;
+    // transition: opacity 2s ease-in-out;
 }
 
 #intro-btn {
-    height: 50vh;
     overflow: hidden;
     position: relative;
+    // transition: opacity 2s ease-in-out;
 }
 
 .notification {
@@ -236,6 +245,13 @@ main {
 
 .button-disabled {
     pointer-events: none;
+}
+
+.enemy {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 

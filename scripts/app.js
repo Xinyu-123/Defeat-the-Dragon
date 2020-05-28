@@ -10,9 +10,9 @@ let character_form = document.getElementById('character-select')
 let STOKE_COOLDOWN = 2;
 export let player;
 
-start_btn.addEventListener('click', async () => {
+start_btn.addEventListener('click', () => {
     let character_class = getCharacterVal(character_form, 'class');
-    let type = await character_class;
+    let type = character_class;
     // console.log({type});
     // console.log(`You've started Your Adventure as a ${type}`);
     player = new Player({
@@ -27,33 +27,6 @@ start_btn.addEventListener('click', async () => {
 })
 
 
-export function updateFlame() {
-    let flame = $('.flame');
-    let health = player._health;
-    console.log(flame);
-    
-    console.log('health: ' + health)
-    
-    flame.on('webkitAnimationIteration mozAnimationIteration AnimationIteration', function() {
-        if(health < 25){
-            flame.attr('id', 'flame-sm');
-            flame.attr('opacity', '0.2');
-        }
-        if(health < 50 && health >= 25){
-            flame.attr('id', 'flame-md');
-            flame.attr('style', 'opacity: 0.4');
-        }
-        if(health < 75 && health >= 50){
-            flame.attr('id', 'flame-lg');
-            flame.attr('style', 'opacity: 0.6');
-        }
-        if(health >= 75){
-            flame.attr('id', 'flame-xl');
-            flame.attr('style', 'opacity: 0.8');
-        }
-    });
-    
-}
 
 function getCharacterVal(form, name) {
     let val;
