@@ -1,11 +1,25 @@
-var app = require('./app');
+const app = require('./app');
 var $ = require('jquery');
 const util = require('./Utility');
 
+
 module.exports = {
 
-    stoke_flame: function(health) {
+    create_noti: function(options){
+        let noti_type = options.type;
+        
+        var text = $('<div>').addClass('notification').css('opacity', '0').text(module.exports[noti_type](options)).prependTo('div.text-container');
+        text.animate({opacity: 1}, 100, 'linear', function() {
+            //clear the overflowed notifications
+         });
+    },
+
+    stoke_flame: function(options) {
+
         let texts = [];
+        let health = options.health;
+
+
 
         texts.push('You stoke the flame. The flame is small');
         texts.push('You stoke the flame. The flame is glowing');
@@ -46,8 +60,29 @@ module.exports = {
 
     def_noti: function () {
 
-    }
+    },
 
+    battle_win_noti: function (options) {
+        return `You have defeated a level ${options.enemy._level} ${options.enemy._type}`;
+    },
+
+    gain_xp: function (options) {
+        return `You have gained ${options.xp}xp`;
+    },
+
+    level_up: function(options) {
+        return `You have increased to level ${options.level}. 
+                \nYour attack has increased by ${options.stats.attack} to ${app.player._attack}.
+                \nYour defence has increased by ${options.stats.defence} to ${app.player._defence}.`
+    },
+
+    enemy_att_noti: function(options) {
+        return `${options.enemy._type} has attacked you with their ${options.enemy._weapon._name} and dealt ${options.attack} damage.`
+    },
+
+    player_death: function(){
+        return "oh jeez, looks like you died :("
+    }
 
 
     

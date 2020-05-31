@@ -24,7 +24,6 @@ start_btn.addEventListener('click', () => {
                         level: 1
                          });
 
-    console.log(player);
 })
 
 

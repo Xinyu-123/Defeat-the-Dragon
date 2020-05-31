@@ -1,20 +1,12 @@
-import Weapon from './Weapons'
-;
+import Weapon from './Weapons';
+
 class Character {
     constructor(options){
         this._attack = options.attack;
         this._defence = options.defence;
         this._weapon = new Weapon(options.weapon);
         this._health = options.health
-        this._level = options.level;
-    }
-
-    get type() {
-        return this._type;
-    }
-
-    set type(type) {
-        this._type = type;
+        this._level = options.level;        
     }
 
     get attack() {
@@ -47,14 +39,6 @@ class Character {
 
     set weapon(weapon) {
         this._weapon = weapon;
-    }
-
-    get attack_delay(){
-        return this._attack_delay;
-    }
-
-    set attack_delay(delay) {
-        this._attack_delay = delay;
     }
 
     get level(){

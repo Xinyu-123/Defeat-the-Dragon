@@ -6,9 +6,12 @@ import Button from './Button';
 import * as Game from './gamepage';
 import $ from 'jquery';
 
+const app = require('./app');
+const noti = require('./notification');
 class Fade extends Highway.Transition{
     in({from, to, done}) {
-        
+        console.log({noti});
+
         const tl = new TimelineLite();
 
         document.getElementsByClassName('flame')[0].style.opacity = 0;
@@ -16,10 +19,11 @@ class Fade extends Highway.Transition{
             from.remove();
             let grad = $('<div>').addClass('text-gradient');
            $('.text-container').append(grad);
-            
+
+           
            Game.setUpGame();
             
-        
+           
             done();
         }})
     

@@ -1,4 +1,4 @@
-import Noti from './notification';
+
 import Button from './Button';
 import Enemy from './Enemy';
 
@@ -6,14 +6,17 @@ import $ from 'jquery';
 import * as app from './app';
 
 const ButtonFunc = require('./buttonFunctions');
+const Player = require('./Player');
+const Util = require('./Utility');
+const Noti = require('./notification');
 
 export let enemy;
 export let stoke_btn;
 export let att_btn;
 export let def_btn;
+export let battle_count = 1;
 
 export function setUpGame() {
-
     setTimeout(() => {
         $('.flame').animate({opacity: 0.2}, 1000, 'linear');
 
@@ -30,7 +33,6 @@ export function setUpGame() {
         });
 
         $(stoke_btn._element).hide().appendTo('div#intro-btn').fadeIn(2000);
-        Noti.stoke_flame()
 
     }, 4000);
 
@@ -38,28 +40,52 @@ export function setUpGame() {
 }
 
 export function createEnemy(options){
-    enemy = new Enemy(options);
+    battle_count++;
+    // enemy = new Enemy(options);
     // $('.interaction-container').hide().appendTo(enemy._element).fadeIn(1000);
-    $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
+    // $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
+    $('')
 }
 
 export function defeatEnemy(enemy){
-    console.log(enemy);
+
     if(enemy._health <= 0){
-        console.log(`you have defeated ${enemy._type}`);
+
+        //send notification
+        Noti.create_noti({
+            type: 'battle_win_noti',
+            enemy: enemy
+        })
+
+        //remove image element
+        $(enemy._element).fadeOut(1000);
+
+        //handle experience
+        app.player.gainXP(enemy._xp);
+        clearInterval(enemy._attack_int);
+
+        setTimeout(() => {
+            createEnemy();
+        }, 2000)
+
+        
+        module.exports.enemy = null;
+
+        //show reward screen on interaction container
+        //proceed.
     }
     
 }
 
 export function updateFlame() {
     let flame = $('.flame');
-    let health = app.player._health;
     
      //Change the flame's opacity and animation to reflect the players health
      flame.on('webkitAnimationIteration mozAnimationIteration AnimationIteration', function() {
-        if(health < 25){
+        let health = app.player._health;
+        if(health < 25 && health > 0){
             flame.attr('id', 'flame-sm');
-            flame.attr('opacity', '0.1');
+            flame.attr('style', 'opacity', '0.1');
         }
         if(health < 50 && health >= 25){
             flame.attr('id', 'flame-md');
@@ -73,12 +99,11 @@ export function updateFlame() {
             flame.attr('id', 'flame-xl');
             flame.attr('style', 'opacity: 1');
         }
+        if(health == 0){
+            flame.fadeOut(5000);
+        }
     });
 }
-
-// text.animate({opacity: 1}, 100, 'linear', function() {
-//     //clear the overflowed notifications
-//  });
 
 export function updateScreen1(){
 
@@ -118,12 +143,14 @@ export function updateScreen3() {
     let container = $('.interaction-container');
     enemy = new Enemy({
         type: 'skeleton',
-        attack: 10,
+        attack: 30,
         defence: 2,
         health: 20,
-        weapon: 'none',
+        level: 1,
+        weapon: 'fists',
         image: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eabda171-95e1-4698-8410-03017288ab53/dauo6gg-ac9d6d32-2e74-4134-907f-5420e56104dc.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZWFiZGExNzEtOTVlMS00Njk4LTg0MTAtMDMwMTcyODhhYjUzXC9kYXVvNmdnLWFjOWQ2ZDMyLTJlNzQtNDEzNC05MDdmLTU0MjBlNTYxMDRkYy5naWYifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.eC7KxwhinKa9veieaPyH13mbSrns3DQOcFn70sAP3rE'
     })
+    enemy.attack_player();
 
     enemy._element.hide().appendTo(container).delay(2000).fadeIn(2000);
 
@@ -136,7 +163,7 @@ export function updateScreen4() {
         id: 'attack-btn',
         text: 'attack',
         click_events: [ButtonFunc.attack_btn],
-        cooldown: 3,
+        cooldown: app.player._weapon._cooldown,
         width: 60
     });
 
