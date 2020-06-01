@@ -2,8 +2,8 @@ import Weapon from './Weapons';
 
 class Character {
     constructor(options){
-        this._attack = options.attack;
-        this._defence = options.defence;
+        this._attack = options.stats.attack;
+        this._defence = options.stats.defence;
         this._weapon = new Weapon(options.weapon);
         this._health = options.health
         this._level = options.level;        

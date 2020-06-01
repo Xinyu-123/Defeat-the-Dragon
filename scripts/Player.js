@@ -85,10 +85,15 @@ class Player extends Character {
             //     container.removeChild(container.firstChild);
             // }
 
-            enemy.clear_attack();
+            clearInterval(enemy._attack_int);
+
             $('.interaction-container').children().fadeOut(1000);
 
             Page.enemy = null;
+
+            let game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
+            $(game_over).hide().appendTo('.interaction-container').fadeIn(1000);
+            // https://pngimg.com/uploads/game_over/game_over_PNG22.png
             
         }
     }

@@ -6064,8 +6064,8 @@ var Character = /*#__PURE__*/function () {
   function Character(options) {
     _classCallCheck(this, Character);
 
-    this._attack = options.attack;
-    this._defence = options.defence;
+    this._attack = options.stats.attack;
+    this._defence = options.stats.defence;
     this._weapon = new _Weapons.default(options.weapon);
     this._health = options.health;
     this._level = options.level;
@@ -17347,16 +17347,16 @@ module.exports = {
   stoke_flame: function stoke_flame(options) {
     var texts = [];
     var health = options.health;
-    texts.push('You stoke the flame. The flame is small');
-    texts.push('You stoke the flame. The flame is glowing');
-    texts.push('You stoke the flame. The flame flickers');
-    texts.push('You stoke the flame. It feels warm');
-    texts.push('You stoke the flame. It fills you with strength');
-    texts.push('You stoke the flame. The fire is bright');
-    texts.push('You stoke the flame. The flame burns');
-    texts.push('You stoke the flame. The fire is roaring.');
-    texts.push('You stoke the flame. The fire is intense.');
-    texts.push('You stoke the flame. The fire is dazzling.');
+    texts.push('You stoke the flame. The flame is small. You gained 25 health.');
+    texts.push('You stoke the flame. The flame is glowing. You gained 25 health.');
+    texts.push('You stoke the flame. The flame flickers. You gained 25 health.');
+    texts.push('You stoke the flame. It feels warm. You gained 25 health.');
+    texts.push('You stoke the flame. It fills you with strength. You gained 25 health.');
+    texts.push('You stoke the flame. The fire is bright. You gained 25 health.');
+    texts.push('You stoke the flame. The flame burns. You gained 25 health.');
+    texts.push('You stoke the flame. The fire is roaring. You gained 25 health.');
+    texts.push('You stoke the flame. The fire is intense. You gained 25 health.');
+    texts.push('You stoke the flame. The fire is dazzling. You gained 25 health.');
 
     switch (true) {
       case health >= 25 && health < 50:
@@ -17394,6 +17394,9 @@ module.exports = {
   },
   player_death: function player_death() {
     return "oh jeez, looks like you died :(";
+  },
+  enemy_appear: function enemy_appear(options) {
+    return "A ".concat(options.enemy, " has appeared. It looks angry.");
   }
 };
 },{"./app":"../scripts/app.js","jquery":"../node_modules/jquery/dist/jquery.js","./Utility":"../scripts/Utility.js"}],"../scripts/Enemy.js":[function(require,module,exports) {
@@ -17480,13 +17483,23 @@ var Enemy = /*#__PURE__*/function (_Character) {
         case 4:
           return 40;
       }
-    }
+    } // ['skeleton', 'troll', 'undead-wizard', 'slime']
+
   }, {
     key: "getEnemyImage",
     value: function getEnemyImage(type) {
       switch (type) {
         case 'skeleton':
           return 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eabda171-95e1-4698-8410-03017288ab53/dauo6gg-ac9d6d32-2e74-4134-907f-5420e56104dc.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZWFiZGExNzEtOTVlMS00Njk4LTg0MTAtMDMwMTcyODhhYjUzXC9kYXVvNmdnLWFjOWQ2ZDMyLTJlNzQtNDEzNC05MDdmLTU0MjBlNTYxMDRkYy5naWYifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.eC7KxwhinKa9veieaPyH13mbSrns3DQOcFn70sAP3rE';
+
+        case 'troll':
+          return 'https://i.pinimg.com/originals/f9/fa/6f/f9fa6fb55ae4301740214a13163c26e2.gif';
+
+        case 'undead-wizard':
+          return 'https://lh3.googleusercontent.com/proxy/c0B9Q66uAwvvyyJhAcESGwkhTcg8JoeIUxeZs8rT9ZjKLgEIDtKA7EM5ZQ796y8dimogFGiyuD3DUDQbRQFRu9dcxKvJQvY';
+
+        case 'slime':
+          return 'https://1.bp.blogspot.com/-Rkci3A5ZXbc/V1HTp_7leiI/AAAAAAAABwM/mXn1ZJm8e1Y0PX9xRVdSkbTLa9KXvIzLgCLcB/s320/Green-Slime-Attack-Down-1.gif';
       }
     }
   }, {
@@ -17519,7 +17532,51 @@ var Enemy = /*#__PURE__*/function (_Character) {
   }, {
     key: "clear_attack",
     value: function clear_attack() {
+      console.log('clear attack');
       clearInterval(this._attack_int);
+    }
+  }], [{
+    key: "get_enemy",
+    value: function get_enemy() {
+      var level = _app.player._level;
+      var type = this.get_enemy_type();
+
+      if (level >= 4) {//spawn dragon
+      }
+
+      var info = {
+        type: type,
+        stats: this.get_enemy_stats(),
+        level: level,
+        health: this.get_enemy_health(type, level),
+        weapon: this.get_enemy_weapon()
+      };
+      return info;
+    }
+  }, {
+    key: "get_enemy_type",
+    value: function get_enemy_type() {
+      var types = ['skeleton', 'troll', 'undead-wizard', 'slime'];
+      var randomElement = types[Math.floor(Math.random() * types.length)];
+      return randomElement;
+    }
+  }, {
+    key: "get_enemy_stats",
+    value: function get_enemy_stats(type, level) {
+      return {
+        attack: 12,
+        defence: 2
+      };
+    }
+  }, {
+    key: "get_enemy_weapon",
+    value: function get_enemy_weapon(type) {
+      return 'fists';
+    }
+  }, {
+    key: "get_enemy_health",
+    value: function get_enemy_health(level, type) {
+      return 30;
     }
   }]);
 
@@ -17659,12 +17716,14 @@ function setUpGame() {
   }, 4000);
 }
 
-function createEnemy(options) {
-  exports.battle_count = battle_count = battle_count + 1; // enemy = new Enemy(options);
-  // $('.interaction-container').hide().appendTo(enemy._element).fadeIn(1000);
-  // $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
-
-  (0, _jquery.default)('');
+function createEnemy() {
+  exports.enemy = enemy = new _Enemy.default(_Enemy.default.get_enemy());
+  (0, _jquery.default)(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
+  Noti.create_noti({
+    type: 'enemy_appear',
+    enemy: enemy._type
+  });
+  enemy.attack_player();
 }
 
 function defeatEnemy(enemy) {
@@ -17681,7 +17740,7 @@ function defeatEnemy(enemy) {
     clearInterval(enemy._attack_int);
     setTimeout(function () {
       createEnemy();
-    }, 2000);
+    }, 4000);
     module.exports.enemy = null; //show reward screen on interaction container
     //proceed.
   }
@@ -17758,17 +17817,22 @@ function updateScreen3() {
   var container = (0, _jquery.default)('.interaction-container');
   exports.enemy = enemy = new _Enemy.default({
     type: 'skeleton',
-    attack: 30,
-    defence: 2,
+    stats: {
+      attack: 30,
+      defence: 2
+    },
     health: 20,
     level: 1,
-    weapon: 'fists',
-    image: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eabda171-95e1-4698-8410-03017288ab53/dauo6gg-ac9d6d32-2e74-4134-907f-5420e56104dc.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZWFiZGExNzEtOTVlMS00Njk4LTg0MTAtMDMwMTcyODhhYjUzXC9kYXVvNmdnLWFjOWQ2ZDMyLTJlNzQtNDEzNC05MDdmLTU0MjBlNTYxMDRkYy5naWYifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.eC7KxwhinKa9veieaPyH13mbSrns3DQOcFn70sAP3rE'
+    weapon: 'fists'
   });
-  enemy.attack_player();
+  Noti.create_noti({
+    type: 'enemy_appear',
+    enemy: enemy._type
+  });
 
   enemy._element.hide().appendTo(container).delay(2000).fadeIn(2000);
 
+  enemy.attack_player();
   updateScreen4();
 }
 
@@ -17929,10 +17993,11 @@ var Player = /*#__PURE__*/function (_Character) {
         //     container.removeChild(container.firstChild);
         // }
 
-        _gamepage.enemy.clear_attack();
-
+        clearInterval(_gamepage.enemy._attack_int);
         $('.interaction-container').children().fadeOut(1000);
         Page.enemy = null;
+        var game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
+        $(game_over).hide().appendTo('.interaction-container').fadeIn(1000); // https://pngimg.com/uploads/game_over/game_over_PNG22.png
       }
     }
   }]);
@@ -18079,8 +18144,10 @@ start_btn.addEventListener('click', function () {
 
   exports.player = player = new _Player.default({
     class: type,
-    attack: 5,
-    defence: 5,
+    stats: {
+      attack: 5,
+      defence: 5
+    },
     weapon: "Shortsword",
     health: 1,
     level: 1
@@ -18156,7 +18223,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63246" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61874" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

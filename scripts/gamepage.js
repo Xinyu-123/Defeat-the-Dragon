@@ -39,12 +39,16 @@ export function setUpGame() {
 
 }
 
-export function createEnemy(options){
-    battle_count++;
-    // enemy = new Enemy(options);
-    // $('.interaction-container').hide().appendTo(enemy._element).fadeIn(1000);
-    // $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
-    $('')
+export function createEnemy(){
+
+    enemy = new Enemy(Enemy.get_enemy());
+
+    $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
+    Noti.create_noti({
+        type: 'enemy_appear',
+        enemy: enemy._type
+    })
+    enemy.attack_player();
 }
 
 export function defeatEnemy(enemy){
@@ -66,7 +70,7 @@ export function defeatEnemy(enemy){
 
         setTimeout(() => {
             createEnemy();
-        }, 2000)
+        }, 4000)
 
         
         module.exports.enemy = null;
@@ -143,16 +147,22 @@ export function updateScreen3() {
     let container = $('.interaction-container');
     enemy = new Enemy({
         type: 'skeleton',
-        attack: 30,
-        defence: 2,
+        stats: {
+            attack: 30,
+            defence: 2
+        },
         health: 20,
         level: 1,
-        weapon: 'fists',
-        image: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/eabda171-95e1-4698-8410-03017288ab53/dauo6gg-ac9d6d32-2e74-4134-907f-5420e56104dc.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvZWFiZGExNzEtOTVlMS00Njk4LTg0MTAtMDMwMTcyODhhYjUzXC9kYXVvNmdnLWFjOWQ2ZDMyLTJlNzQtNDEzNC05MDdmLTU0MjBlNTYxMDRkYy5naWYifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.eC7KxwhinKa9veieaPyH13mbSrns3DQOcFn70sAP3rE'
+        weapon: 'fists'
+    });
+
+    Noti.create_noti({
+        type: 'enemy_appear',
+        enemy: enemy._type
     })
-    enemy.attack_player();
 
     enemy._element.hide().appendTo(container).delay(2000).fadeIn(2000);
+    enemy.attack_player();
 
     updateScreen4();
 }

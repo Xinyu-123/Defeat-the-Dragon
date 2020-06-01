@@ -17,8 +17,10 @@ start_btn.addEventListener('click', () => {
     // console.log(`You've started Your Adventure as a ${type}`);
     player = new Player({
                         class: type,
-                        attack: 5,
-                        defence: 5,
+                        stats: {
+                            attack: 5,
+                            defence: 5
+                        },
                         weapon: "Shortsword",
                         health: 1,
                         level: 1

@@ -21,18 +21,18 @@ module.exports = {
 
 
 
-        texts.push('You stoke the flame. The flame is small');
-        texts.push('You stoke the flame. The flame is glowing');
-        texts.push('You stoke the flame. The flame flickers');
+        texts.push('You stoke the flame. The flame is small. You gained 25 health.');
+        texts.push('You stoke the flame. The flame is glowing. You gained 25 health.');
+        texts.push('You stoke the flame. The flame flickers. You gained 25 health.');
 
-        texts.push('You stoke the flame. It feels warm');
-        texts.push('You stoke the flame. It fills you with strength');
-        texts.push('You stoke the flame. The fire is bright');
-        texts.push('You stoke the flame. The flame burns');
+        texts.push('You stoke the flame. It feels warm. You gained 25 health.');
+        texts.push('You stoke the flame. It fills you with strength. You gained 25 health.');
+        texts.push('You stoke the flame. The fire is bright. You gained 25 health.');
+        texts.push('You stoke the flame. The flame burns. You gained 25 health.');
 
-        texts.push('You stoke the flame. The fire is roaring.');
-        texts.push('You stoke the flame. The fire is intense.');
-        texts.push('You stoke the flame. The fire is dazzling.');
+        texts.push('You stoke the flame. The fire is roaring. You gained 25 health.');
+        texts.push('You stoke the flame. The fire is intense. You gained 25 health.');
+        texts.push('You stoke the flame. The fire is dazzling. You gained 25 health.');
 
 
         switch (true) {
@@ -82,6 +82,10 @@ module.exports = {
 
     player_death: function(){
         return "oh jeez, looks like you died :("
+    },
+
+    enemy_appear: function(options){
+        return `A ${options.enemy} has appeared. It looks angry.`
     }
 
 
