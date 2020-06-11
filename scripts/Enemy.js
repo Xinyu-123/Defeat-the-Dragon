@@ -6,6 +6,7 @@ import { player } from './app';
 const Util = require('./Utility');
 const Noti = require('./notification');
 const Page = require('./gamepage')
+const Player = require('./Player')
 
 
 export default class Enemy extends Character {
@@ -47,9 +48,12 @@ export default class Enemy extends Character {
             case 'troll':
                 return 'https://i.pinimg.com/originals/f9/fa/6f/f9fa6fb55ae4301740214a13163c26e2.gif';
             case 'undead-wizard':
-                return 'https://lh3.googleusercontent.com/proxy/c0B9Q66uAwvvyyJhAcESGwkhTcg8JoeIUxeZs8rT9ZjKLgEIDtKA7EM5ZQ796y8dimogFGiyuD3DUDQbRQFRu9dcxKvJQvY';
+                return 'https://i.imgur.com/zhxu4Ni.gif';
             case 'slime':
                 return 'https://1.bp.blogspot.com/-Rkci3A5ZXbc/V1HTp_7leiI/AAAAAAAABwM/mXn1ZJm8e1Y0PX9xRVdSkbTLa9KXvIzLgCLcB/s320/Green-Slime-Attack-Down-1.gif';
+            case 'dragon':
+                return 'https://pa1.narvii.com/6149/a01bcd302366216689b3011ffe8b04d39f5468de_hq.gif';
+
         }
     }
 
@@ -67,6 +71,8 @@ export default class Enemy extends Character {
 
         console.log('attack Interval')
         attack = Util.getAttack(attack) - defence;
+        if(attack < 0)
+            attack = 0;
 
         player._health -= attack;
         Noti.create_noti({
@@ -77,7 +83,7 @@ export default class Enemy extends Character {
         })
 
         console.log(player)
-        player.checkDeath(player._health);
+        player.health_change({health: player._health});
 
         
     }
@@ -89,23 +95,34 @@ export default class Enemy extends Character {
     }
 
     static get_enemy(){
-        let level = player._level;
-        let type = this.get_enemy_type()
-
+        let level = player._level, type, info;
         if(level >= 4){
             //spawn dragon
+            console.log('here');
+            info = {
+                type: 'dragon',
+                stats: {attack: 60, defence: 10},
+                level: level,
+                health: 5,
+                weapon: 'fists'
+            };
+            
+        }
+        else{
+            type = this.get_enemy_type()
+
+            info = {
+                type: type, 
+                stats: this.get_enemy_stats(), 
+                level: level, 
+                health: this.get_enemy_health(type, level),
+                weapon: this.get_enemy_weapon(),
+            };
+    
         }
 
-        let info = {
-            type: type, 
-            stats: this.get_enemy_stats(), 
-            level: level, 
-            health: this.get_enemy_health(type, level),
-            weapon: this.get_enemy_weapon(),
-        };
-
-        
         return info;
+
     }
 
     static get_enemy_type(){
@@ -126,6 +143,26 @@ export default class Enemy extends Character {
 
     static get_enemy_health(level, type){
         return 30;
+    }
+
+    static get_dragon(){
+        let level = player._level;
+        let type = 'dragon';
+
+        if(level >= 4){
+            //spawn dragon
+        }
+
+        let info = {
+            type: type, 
+            stats: this.get_enemy_stats(), 
+            level: level, 
+            health: this.get_enemy_health(type, level),
+            weapon: this.get_enemy_weapon(),
+        };
+
+        
+        return info;
     }
 
 } 

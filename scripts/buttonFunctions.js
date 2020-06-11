@@ -1,20 +1,24 @@
 
 import Character from './Character';
-import $ from 'jquery';
 import Button from './Button';
 import * as Noti from './notification';
+import {player} from './app';
 
 const page = require('./gamepage');
 const Weapon = require('./Weapons');
 const noti = require('./notification');
 const Util = require('./Utility');
 const app = require('./app');
+const $ = require('jquery');
 
 module.exports = {
     stoke_fire: function() {
         app.player._health += 25;
-        module.exports.healthBound();
-        
+        player.health_change({
+            health: app.player._health,
+            max_health: app.player._max_health
+        })
+        console.log(app.player._health);
         let health = app.player._health;
 
         noti.create_noti({
@@ -32,8 +36,8 @@ module.exports = {
     
 
     healthBound: function() {
-        if(app.player._health > 100){
-            app.player._health = 100;
+        if(app.player._health > app.player._max_health){
+            app.player._health = app.player._max_health;
         }
     },
 
@@ -66,6 +70,30 @@ module.exports = {
     defend_btn: function(options) {
         
     },
+
+    stun_btn: function(){
+
+    },
+
+    spell_btn: function() {
+
+    },
+
+    restart_btn: function(){
+        let grad = $('<div>').addClass('text-gradient');
+        $('.text-container').children().fadeOut(1000);
+        $('.interaction-container').children('img').fadeOut(1000);
+        $('.battle-options-container').fadeOut(1000);
+        setTimeout(() => {
+            $('.text-container').empty().append(grad);
+            $('.interaction-container').children('img').remove();
+            $('.battle-options-container').remove();
+        },1000)
+        
+        player._health = 100;
+
+        page.updateScreen1();
+    }
 
     
     

@@ -2,11 +2,13 @@ import Character from './Character';
 import Weapon from './Weapons';
 import { player } from './app';
 import { enemy } from './gamepage';
+import Button from './Button';
 
 
 const Noti = require('./notification');
 const Util = require('./Utility');
 const Page = require('./gamepage');
+const ButtonFunc = require('./buttonFunctions');
 const $ = require('jquery');
 
 class Player extends Character {
@@ -16,7 +18,7 @@ class Player extends Character {
         super(options);
         this._class = options.class;
         this._xp_to_lvl = this.getLevelXP(this._level);
-    
+        this._max_health = options.max_health;
     }
 
     getLevelXP(level) {
@@ -56,6 +58,7 @@ class Player extends Character {
 
         this._attack += 5;
         this.defence += 5;
+        this._max_health += 50;
         this._level = level;
         this._xp_to_lvl = this.getLevelXP(level);
 
@@ -74,6 +77,11 @@ class Player extends Character {
         console.log(player)
     }
 
+    health_change(options){
+        this.checkDeath(options.health);
+        this.health_bound();
+    }
+
     checkDeath(health){
         if(health <= 0){
             Noti.create_noti({
@@ -85,19 +93,49 @@ class Player extends Character {
             //     container.removeChild(container.firstChild);
             // }
 
-            clearInterval(enemy._attack_int);
+            clearInterval(Page.enemy._attack_int);
+            console.log($('.interaction-container').children())
 
-            $('.interaction-container').children().fadeOut(1000);
+            $('.interaction-container').children('img').fadeOut(1000);
+            
+            $('.battle-options-container').children().fadeOut(1000);
+            
+
+
 
             Page.enemy = null;
 
-            let game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
-            $(game_over).hide().appendTo('.interaction-container').fadeIn(1000);
+            setTimeout(() => {
+                $('.battle-options-container').empty();
+                $('.interaction-container').children('img').remove();
+                let game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
+                let try_again_btn = new Button({
+                    id: 'alt-btn',
+                    text: 'try again',
+                    click_events: [ButtonFunc.restart_btn],
+                    cooldown: 0,
+                    width: 60
+                })
+                console.log('1');
+                $(game_over).hide().appendTo('.interaction-container').fadeIn(1000);
+                console.log('2');
+                $(try_again_btn._element).hide().appendTo('.battle-options-container').delay(500).fadeIn(2000);
+
+                console.log('3');
+
+            }, 1000)
+            
             // https://pngimg.com/uploads/game_over/game_over_PNG22.png
             
         }
     }
 
+    health_bound() {
+
+        if(player.health > player._max_health){
+            player.health = player._max_health;
+        }
+    }
 }
 
 

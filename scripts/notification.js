@@ -2,13 +2,19 @@ const app = require('./app');
 var $ = require('jquery');
 const util = require('./Utility');
 
-
+export let hello = "hello";
 module.exports = {
 
     create_noti: function(options){
         let noti_type = options.type;
-        
-        var text = $('<div>').addClass('notification').css('opacity', '0').text(module.exports[noti_type](options)).prependTo('div.text-container');
+
+
+        var text = $('<div>')
+                    .addClass('notification')
+                    .css('opacity', '0')
+                    .css('color', module.exports.get_text_color(noti_type))
+                    .text(module.exports[noti_type](options))
+                    .prependTo('div.text-container');
         text.animate({opacity: 1}, 100, 'linear', function() {
             //clear the overflowed notifications
          });
@@ -86,9 +92,22 @@ module.exports = {
 
     enemy_appear: function(options){
         return `A ${options.enemy} has appeared. It looks angry.`
+    },
+
+    get_text_color: function(type){
+        switch (type){
+            case 'enemy_att_noti':
+                return 'red';
+            case 'stoke_flame':
+                return 'lightgreen';
+            case 'att_noti':
+                return 'lightblue';
+        }
+
+
+        return 'white';
     }
 
 
     
 }
-

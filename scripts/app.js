@@ -23,7 +23,8 @@ start_btn.addEventListener('click', () => {
                         },
                         weapon: "Shortsword",
                         health: 1,
-                        level: 1
+                        level: 1,
+                        max_health: 100
                          });
 
 })

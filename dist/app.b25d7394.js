@@ -17267,7 +17267,6 @@ var Button = function Button(options) {
 };
 
 function startcooldown(btn, option) {
-  console.log(btn);
   var cd = btn[0]._cooldown;
   var start = cd,
       left = 1;
@@ -17297,48 +17296,55 @@ function getBtnFunction(id) {
 var _default = Button;
 exports.default = _default;
 },{"jquery":"../node_modules/jquery/dist/jquery.js","./app":"../scripts/app.js","./gamepage":"../scripts/gamepage.js","./Player":"../scripts/Player.js"}],"../scripts/Utility.js":[function(require,module,exports) {
-// import { enemy } from './gamepage';
 module.exports = {
   getRandomInt: function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
   },
   getAttack: function getAttack(attack) {
     var roll = module.exports.getRandomInt(5);
-
-    switch (roll) {
-      case 0:
-        return Math.floor(attack - attack * 0.25);
-        break;
-
-      case 1:
-        return Math.floor(attack - attack * 0.1);
-        break;
-
-      case 2:
-        return Math.floor(attack);
-        break;
-
-      case 3:
-        return Math.floor(attack + attack * 0.1);
-        break;
-
-      case 4:
-        return Math.floor(attack + attack * 0.25);
-        break;
-    }
+    var low = Math.floor(attack - attack * 0.1);
+    var high = Math.floor(attack + attack * 0.1);
+    var value = module.exports.getRandomInt(high - low);
+    value = low + value;
+    return value; // switch (roll){
+    //     case 0:
+    //         return Math.floor(attack - (attack * 0.25));
+    //         break;
+    //     case 1:
+    //         return Math.floor(attack - (attack * 0.1));
+    //         break;
+    //     case 2:
+    //         return Math.floor(attack);
+    //         break;
+    //     case 3:
+    //         return Math.floor(attack + (attack * 0.1));
+    //         break; 
+    //     case 4:
+    //         return Math.floor(attack + (attack * 0.25));
+    //         break;
+    // }
   }
 };
 },{}],"../scripts/notification.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.hello = void 0;
+
 var app = require('./app');
 
 var $ = require('jquery');
 
 var util = require('./Utility');
 
+var hello = "hello";
+exports.hello = hello;
 module.exports = {
   create_noti: function create_noti(options) {
     var noti_type = options.type;
-    var text = $('<div>').addClass('notification').css('opacity', '0').text(module.exports[noti_type](options)).prependTo('div.text-container');
+    var text = $('<div>').addClass('notification').css('opacity', '0').css('color', module.exports.get_text_color(noti_type)).text(module.exports[noti_type](options)).prependTo('div.text-container');
     text.animate({
       opacity: 1
     }, 100, 'linear', function () {//clear the overflowed notifications
@@ -17397,6 +17403,20 @@ module.exports = {
   },
   enemy_appear: function enemy_appear(options) {
     return "A ".concat(options.enemy, " has appeared. It looks angry.");
+  },
+  get_text_color: function get_text_color(type) {
+    switch (type) {
+      case 'enemy_att_noti':
+        return 'red';
+
+      case 'stoke_flame':
+        return 'lightgreen';
+
+      case 'att_noti':
+        return 'lightblue';
+    }
+
+    return 'white';
   }
 };
 },{"./app":"../scripts/app.js","jquery":"../node_modules/jquery/dist/jquery.js","./Utility":"../scripts/Utility.js"}],"../scripts/Enemy.js":[function(require,module,exports) {
@@ -17444,6 +17464,8 @@ var Util = require('./Utility');
 var Noti = require('./notification');
 
 var Page = require('./gamepage');
+
+var Player = require('./Player');
 
 var Enemy = /*#__PURE__*/function (_Character) {
   _inherits(Enemy, _Character);
@@ -17496,10 +17518,13 @@ var Enemy = /*#__PURE__*/function (_Character) {
           return 'https://i.pinimg.com/originals/f9/fa/6f/f9fa6fb55ae4301740214a13163c26e2.gif';
 
         case 'undead-wizard':
-          return 'https://lh3.googleusercontent.com/proxy/c0B9Q66uAwvvyyJhAcESGwkhTcg8JoeIUxeZs8rT9ZjKLgEIDtKA7EM5ZQ796y8dimogFGiyuD3DUDQbRQFRu9dcxKvJQvY';
+          return 'https://i.imgur.com/zhxu4Ni.gif';
 
         case 'slime':
           return 'https://1.bp.blogspot.com/-Rkci3A5ZXbc/V1HTp_7leiI/AAAAAAAABwM/mXn1ZJm8e1Y0PX9xRVdSkbTLa9KXvIzLgCLcB/s320/Green-Slime-Attack-Down-1.gif';
+
+        case 'dragon':
+          return 'https://pa1.narvii.com/6149/a01bcd302366216689b3011ffe8b04d39f5468de_hq.gif';
       }
     }
   }, {
@@ -17518,6 +17543,7 @@ var Enemy = /*#__PURE__*/function (_Character) {
       var attack = _gamepage.enemy._attack + _gamepage.enemy._weapon._attack;
       console.log('attack Interval');
       attack = Util.getAttack(attack) - defence;
+      if (attack < 0) attack = 0;
       _app.player._health -= attack;
       Noti.create_noti({
         type: 'enemy_att_noti',
@@ -17527,7 +17553,9 @@ var Enemy = /*#__PURE__*/function (_Character) {
       });
       console.log(_app.player);
 
-      _app.player.checkDeath(_app.player._health);
+      _app.player.health_change({
+        health: _app.player._health
+      });
     }
   }, {
     key: "clear_attack",
@@ -17538,19 +17566,34 @@ var Enemy = /*#__PURE__*/function (_Character) {
   }], [{
     key: "get_enemy",
     value: function get_enemy() {
-      var level = _app.player._level;
-      var type = this.get_enemy_type();
+      var level = _app.player._level,
+          type,
+          info;
 
-      if (level >= 4) {//spawn dragon
+      if (level >= 4) {
+        //spawn dragon
+        console.log('here');
+        info = {
+          type: 'dragon',
+          stats: {
+            attack: 60,
+            defence: 10
+          },
+          level: level,
+          health: 5,
+          weapon: 'fists'
+        };
+      } else {
+        type = this.get_enemy_type();
+        info = {
+          type: type,
+          stats: this.get_enemy_stats(),
+          level: level,
+          health: this.get_enemy_health(type, level),
+          weapon: this.get_enemy_weapon()
+        };
       }
 
-      var info = {
-        type: type,
-        stats: this.get_enemy_stats(),
-        level: level,
-        health: this.get_enemy_health(type, level),
-        weapon: this.get_enemy_weapon()
-      };
       return info;
     }
   }, {
@@ -17578,22 +17621,40 @@ var Enemy = /*#__PURE__*/function (_Character) {
     value: function get_enemy_health(level, type) {
       return 30;
     }
+  }, {
+    key: "get_dragon",
+    value: function get_dragon() {
+      var level = _app.player._level;
+      var type = 'dragon';
+
+      if (level >= 4) {//spawn dragon
+      }
+
+      var info = {
+        type: type,
+        stats: this.get_enemy_stats(),
+        level: level,
+        health: this.get_enemy_health(type, level),
+        weapon: this.get_enemy_weapon()
+      };
+      return info;
+    }
   }]);
 
   return Enemy;
 }(_Character2.default);
 
 exports.default = Enemy;
-},{"./Character":"../scripts/Character.js","jquery":"../node_modules/jquery/dist/jquery.js","./gamepage":"../scripts/gamepage.js","./app":"../scripts/app.js","./Utility":"../scripts/Utility.js","./notification":"../scripts/notification.js"}],"../scripts/buttonFunctions.js":[function(require,module,exports) {
+},{"./Character":"../scripts/Character.js","jquery":"../node_modules/jquery/dist/jquery.js","./gamepage":"../scripts/gamepage.js","./app":"../scripts/app.js","./Utility":"../scripts/Utility.js","./notification":"../scripts/notification.js","./Player":"../scripts/Player.js"}],"../scripts/buttonFunctions.js":[function(require,module,exports) {
 "use strict";
 
 var _Character = _interopRequireDefault(require("./Character"));
 
-var _jquery = _interopRequireDefault(require("jquery"));
-
 var _Button = _interopRequireDefault(require("./Button"));
 
 var Noti = _interopRequireWildcard(require("./notification"));
+
+var _app = require("./app");
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -17611,10 +17672,18 @@ var Util = require('./Utility');
 
 var app = require('./app');
 
+var $ = require('jquery');
+
 module.exports = {
   stoke_fire: function stoke_fire() {
     app.player._health += 25;
-    module.exports.healthBound();
+
+    _app.player.health_change({
+      health: app.player._health,
+      max_health: app.player._max_health
+    });
+
+    console.log(app.player._health);
     var health = app.player._health;
     noti.create_noti({
       type: 'stoke_flame',
@@ -17623,23 +17692,23 @@ module.exports = {
     page.updateFlame();
   },
   healthBound: function healthBound() {
-    if (app.player._health > 100) {
-      app.player._health = 100;
+    if (app.player._health > app.player._max_health) {
+      app.player._health = app.player._max_health;
     }
   },
   attack_btn: function attack_btn(options) {
     console.log(page.enemy);
 
     if (page.enemy != null) {
-      var player = app.player;
+      var _player = app.player;
       var enemy = page.enemy;
       var defence = enemy._defence;
-      var attack = player._attack + player._weapon._attack;
+      var attack = _player._attack + _player._weapon._attack;
       attack = Util.getAttack(attack) - defence;
       enemy._health -= attack;
       noti.create_noti({
         type: 'att_noti',
-        player: player,
+        player: _player,
         attack: attack,
         enemy: enemy
       });
@@ -17647,9 +17716,24 @@ module.exports = {
     } else {//no enemy
     }
   },
-  defend_btn: function defend_btn(options) {}
+  defend_btn: function defend_btn(options) {},
+  stun_btn: function stun_btn() {},
+  spell_btn: function spell_btn() {},
+  restart_btn: function restart_btn() {
+    var grad = $('<div>').addClass('text-gradient');
+    $('.text-container').children().fadeOut(1000);
+    $('.interaction-container').children('img').fadeOut(1000);
+    $('.battle-options-container').fadeOut(1000);
+    setTimeout(function () {
+      $('.text-container').empty().append(grad);
+      $('.interaction-container').children('img').remove();
+      $('.battle-options-container').remove();
+    }, 1000);
+    _app.player._health = 100;
+    page.updateScreen1();
+  }
 };
-},{"./Character":"../scripts/Character.js","jquery":"../node_modules/jquery/dist/jquery.js","./Button":"../scripts/Button.js","./notification":"../scripts/notification.js","./gamepage":"../scripts/gamepage.js","./Weapons":"../scripts/Weapons.js","./Utility":"../scripts/Utility.js","./app":"../scripts/app.js"}],"../scripts/gamepage.js":[function(require,module,exports) {
+},{"./Character":"../scripts/Character.js","./Button":"../scripts/Button.js","./notification":"../scripts/notification.js","./app":"../scripts/app.js","./gamepage":"../scripts/gamepage.js","./Weapons":"../scripts/Weapons.js","./Utility":"../scripts/Utility.js","jquery":"../node_modules/jquery/dist/jquery.js"}],"../scripts/gamepage.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17663,7 +17747,7 @@ exports.updateScreen1 = updateScreen1;
 exports.updateScreen2 = updateScreen2;
 exports.updateScreen3 = updateScreen3;
 exports.updateScreen4 = updateScreen4;
-exports.battle_count = exports.def_btn = exports.att_btn = exports.stoke_btn = exports.enemy = void 0;
+exports.battle_count = exports.alt_btn = exports.att_btn = exports.stoke_btn = exports.enemy = void 0;
 
 var _Button = _interopRequireDefault(require("./Button"));
 
@@ -17693,8 +17777,8 @@ var stoke_btn;
 exports.stoke_btn = stoke_btn;
 var att_btn;
 exports.att_btn = att_btn;
-var def_btn;
-exports.def_btn = def_btn;
+var alt_btn;
+exports.alt_btn = alt_btn;
 var battle_count = 1;
 exports.battle_count = battle_count;
 
@@ -17734,16 +17818,29 @@ function defeatEnemy(enemy) {
       enemy: enemy
     }); //remove image element
 
-    (0, _jquery.default)(enemy._element).fadeOut(1000); //handle experience
-
-    app.player.gainXP(enemy._xp);
+    (0, _jquery.default)(enemy._element).fadeOut(1000);
     clearInterval(enemy._attack_int);
-    setTimeout(function () {
-      createEnemy();
-    }, 4000);
+
+    if (enemy._type == 'dragon') {
+      (0, _jquery.default)('.interaction-container').children().fadeOut(1000);
+      setTimeout(victoryScreen, 3000);
+    } else {
+      //handle experience
+      app.player.gainXP(enemy._xp);
+      setTimeout(function () {
+        createEnemy();
+      }, 4000);
+    }
+
     module.exports.enemy = null; //show reward screen on interaction container
     //proceed.
   }
+}
+
+function victoryScreen() {
+  exports.enemy = enemy = null;
+  var you_win = (0, _jquery.default)('<img>').addClass('enemy').attr('src', 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/489b3e0c-0a66-4cbf-a094-0c0a64e3d5bf/dct25y8-8a03030d-7832-44d4-bec3-18625bffb70c.png/v1/fill/w_400,h_300,strp/win_screen__by_accaliawolf53_dct25y8-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD0zMDAiLCJwYXRoIjoiXC9mXC80ODliM2UwYy0wYTY2LTRjYmYtYTA5NC0wYzBhNjRlM2Q1YmZcL2RjdDI1eTgtOGEwMzAzMGQtNzgzMi00NGQ0LWJlYzMtMTg2MjViZmZiNzBjLnBuZyIsIndpZHRoIjoiPD00MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.cVODqpZulBS7btlTzKcW4tN3oLmZ-Y_KILJNIeZuPkU');
+  (0, _jquery.default)(you_win).hide().appendTo('.interaction-container').fadeIn(1000);
 }
 
 function updateFlame() {
@@ -17838,6 +17935,7 @@ function updateScreen3() {
 
 function updateScreen4() {
   var container = (0, _jquery.default)('.interaction-container');
+  var type = app.player._class;
   exports.att_btn = att_btn = new _Button.default({
     id: 'attack-btn',
     text: 'attack',
@@ -17845,16 +17943,42 @@ function updateScreen4() {
     cooldown: app.player._weapon._cooldown,
     width: 60
   });
-  exports.def_btn = def_btn = new _Button.default({
-    id: 'defence-btn',
-    text: 'defend',
-    click_events: [ButtonFunc.defend_btn],
-    cooldown: 3,
-    width: 60
-  });
+
+  switch (type) {
+    case 'Warrior':
+      exports.alt_btn = alt_btn = new _Button.default({
+        id: 'alt-btn',
+        text: 'defend',
+        click_events: [ButtonFunc.defend_btn],
+        cooldown: 4,
+        width: 60
+      });
+      break;
+
+    case 'Wizard':
+      exports.alt_btn = alt_btn = new _Button.default({
+        id: 'alt-btn',
+        text: 'cast spell',
+        click_events: [ButtonFunc.spell_btn],
+        cooldown: 8,
+        width: 60
+      });
+      break;
+
+    case 'Archer':
+      exports.alt_btn = alt_btn = new _Button.default({
+        id: 'alt-btn',
+        text: 'stun',
+        click_events: [ButtonFunc.stun_btn],
+        cooldown: 6,
+        width: 60
+      });
+      break;
+  }
+
   var cont = (0, _jquery.default)("<div>").addClass('battle-options-container').appendTo(container);
   (0, _jquery.default)(att_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
-  (0, _jquery.default)(def_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
+  (0, _jquery.default)(alt_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
 } // player = new Player({
 //     class: type,
 //     attack: 5,
@@ -17877,6 +18001,8 @@ var _Weapons = _interopRequireDefault(require("./Weapons"));
 var _app = require("./app");
 
 var _gamepage = require("./gamepage");
+
+var _Button = _interopRequireDefault(require("./Button"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -17908,6 +18034,8 @@ var Util = require('./Utility');
 
 var Page = require('./gamepage');
 
+var ButtonFunc = require('./buttonFunctions');
+
 var $ = require('jquery');
 
 var Player = /*#__PURE__*/function (_Character) {
@@ -17924,6 +18052,7 @@ var Player = /*#__PURE__*/function (_Character) {
     _this = _super.call(this, options);
     _this._class = options.class;
     _this._xp_to_lvl = _this.getLevelXP(_this._level);
+    _this._max_health = options.max_health;
     return _this;
   }
 
@@ -17968,6 +18097,7 @@ var Player = /*#__PURE__*/function (_Character) {
     value: function levelUP(level) {
       this._attack += 5;
       this.defence += 5;
+      this._max_health += 50;
       this._level = level;
       this._xp_to_lvl = this.getLevelXP(level);
       setTimeout(function () {
@@ -17983,6 +18113,12 @@ var Player = /*#__PURE__*/function (_Character) {
       console.log(_app.player);
     }
   }, {
+    key: "health_change",
+    value: function health_change(options) {
+      this.checkDeath(options.health);
+      this.health_bound();
+    }
+  }, {
     key: "checkDeath",
     value: function checkDeath(health) {
       if (health <= 0) {
@@ -17993,11 +18129,35 @@ var Player = /*#__PURE__*/function (_Character) {
         //     container.removeChild(container.firstChild);
         // }
 
-        clearInterval(_gamepage.enemy._attack_int);
-        $('.interaction-container').children().fadeOut(1000);
+        clearInterval(Page.enemy._attack_int);
+        console.log($('.interaction-container').children());
+        $('.interaction-container').children('img').fadeOut(1000);
+        $('.battle-options-container').children().fadeOut(1000);
         Page.enemy = null;
-        var game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
-        $(game_over).hide().appendTo('.interaction-container').fadeIn(1000); // https://pngimg.com/uploads/game_over/game_over_PNG22.png
+        setTimeout(function () {
+          $('.battle-options-container').empty();
+          $('.interaction-container').children('img').remove();
+          var game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
+          var try_again_btn = new _Button.default({
+            id: 'alt-btn',
+            text: 'try again',
+            click_events: [ButtonFunc.restart_btn],
+            cooldown: 0,
+            width: 60
+          });
+          console.log('1');
+          $(game_over).hide().appendTo('.interaction-container').fadeIn(1000);
+          console.log('2');
+          $(try_again_btn._element).hide().appendTo('.battle-options-container').delay(500).fadeIn(2000);
+          console.log('3');
+        }, 1000); // https://pngimg.com/uploads/game_over/game_over_PNG22.png
+      }
+    }
+  }, {
+    key: "health_bound",
+    value: function health_bound() {
+      if (_app.player.health > _app.player._max_health) {
+        _app.player.health = _app.player._max_health;
       }
     }
   }]);
@@ -18007,7 +18167,7 @@ var Player = /*#__PURE__*/function (_Character) {
 
 var _default = Player;
 exports.default = _default;
-},{"./Character":"../scripts/Character.js","./Weapons":"../scripts/Weapons.js","./app":"../scripts/app.js","./gamepage":"../scripts/gamepage.js","./notification":"../scripts/notification.js","./Utility":"../scripts/Utility.js","jquery":"../node_modules/jquery/dist/jquery.js"}],"../scripts/transition.js":[function(require,module,exports) {
+},{"./Character":"../scripts/Character.js","./Weapons":"../scripts/Weapons.js","./app":"../scripts/app.js","./gamepage":"../scripts/gamepage.js","./Button":"../scripts/Button.js","./notification":"../scripts/notification.js","./Utility":"../scripts/Utility.js","./buttonFunctions":"../scripts/buttonFunctions.js","jquery":"../node_modules/jquery/dist/jquery.js"}],"../scripts/transition.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -18150,7 +18310,8 @@ start_btn.addEventListener('click', function () {
     },
     weapon: "Shortsword",
     health: 1,
-    level: 1
+    level: 1,
+    max_health: 100
   });
 });
 
@@ -18223,7 +18384,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61874" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59482" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

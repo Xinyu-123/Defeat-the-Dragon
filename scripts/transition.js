@@ -15,13 +15,14 @@ class Fade extends Highway.Transition{
         const tl = new TimelineLite();
 
         document.getElementsByClassName('flame')[0].style.opacity = 0;
+        
         tl.fromTo(to, 2, {backgroundPositionY: "0px"}, {backgroundPositionY: '100%', onComplete: () => {
             from.remove();
             let grad = $('<div>').addClass('text-gradient');
-           $('.text-container').append(grad);
+            $('.text-container').append(grad);
 
            
-           Game.setUpGame();
+            Game.setUpGame();
             
            
             done();

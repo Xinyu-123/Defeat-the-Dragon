@@ -13,7 +13,7 @@ const Noti = require('./notification');
 export let enemy;
 export let stoke_btn;
 export let att_btn;
-export let def_btn;
+export let alt_btn;
 export let battle_count = 1;
 
 export function setUpGame() {
@@ -40,7 +40,6 @@ export function setUpGame() {
 }
 
 export function createEnemy(){
-
     enemy = new Enemy(Enemy.get_enemy());
 
     $(enemy._element).hide().appendTo('.interaction-container').fadeIn(1000);
@@ -63,22 +62,37 @@ export function defeatEnemy(enemy){
 
         //remove image element
         $(enemy._element).fadeOut(1000);
-
-        //handle experience
-        app.player.gainXP(enemy._xp);
         clearInterval(enemy._attack_int);
 
-        setTimeout(() => {
-            createEnemy();
-        }, 4000)
+        if(enemy._type == 'dragon'){
+            $('.interaction-container').children().fadeOut(1000);
+            setTimeout(victoryScreen, 3000);
+        }
+        else{
+            //handle experience
+            app.player.gainXP(enemy._xp);
+            
 
-        
+            setTimeout(() => {
+                createEnemy();
+            }, 4000)
+        }
+
+
         module.exports.enemy = null;
 
         //show reward screen on interaction container
         //proceed.
     }
     
+}
+
+function victoryScreen(){
+    
+
+    enemy = null;
+    let you_win = $('<img>').addClass('enemy').attr('src', 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/489b3e0c-0a66-4cbf-a094-0c0a64e3d5bf/dct25y8-8a03030d-7832-44d4-bec3-18625bffb70c.png/v1/fill/w_400,h_300,strp/win_screen__by_accaliawolf53_dct25y8-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3siaGVpZ2h0IjoiPD0zMDAiLCJwYXRoIjoiXC9mXC80ODliM2UwYy0wYTY2LTRjYmYtYTA5NC0wYzBhNjRlM2Q1YmZcL2RjdDI1eTgtOGEwMzAzMGQtNzgzMi00NGQ0LWJlYzMtMTg2MjViZmZiNzBjLnBuZyIsIndpZHRoIjoiPD00MDAifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6aW1hZ2Uub3BlcmF0aW9ucyJdfQ.cVODqpZulBS7btlTzKcW4tN3oLmZ-Y_KILJNIeZuPkU');
+    $(you_win).hide().appendTo('.interaction-container').fadeIn(1000);
 }
 
 export function updateFlame() {
@@ -169,6 +183,7 @@ export function updateScreen3() {
 
 export function updateScreen4() {
     let container = $('.interaction-container')
+    let type = app.player._class;
     att_btn = new Button({
         id: 'attack-btn',
         text: 'attack',
@@ -177,19 +192,43 @@ export function updateScreen4() {
         width: 60
     });
 
-    def_btn = new Button({
-        id: 'defence-btn',
-        text: 'defend',
-        click_events: [ButtonFunc.defend_btn],
-        cooldown: 3,
-        width: 60
-    });
+    switch (type){
+        case 'Warrior':
+            alt_btn = new Button({
+                id: 'alt-btn',
+                text: 'defend',
+                click_events: [ButtonFunc.defend_btn],
+                cooldown: 4,
+                width: 60
+            });
+            break;
+
+        case 'Wizard':
+            alt_btn = new Button({
+                id: 'alt-btn',
+                text: 'cast spell',
+                click_events: [ButtonFunc.spell_btn],
+                cooldown: 8,
+                width: 60
+            });
+            break;
+
+        case 'Archer':
+            alt_btn = new Button({
+                id: 'alt-btn',
+                text: 'stun',
+                click_events: [ButtonFunc.stun_btn],
+                cooldown: 6,
+                width: 60
+            });
+            break;
+    }
 
     let cont = $("<div>").addClass('battle-options-container').appendTo(container);
 
     $(att_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
 
-    $(def_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
+    $(alt_btn._element).hide().appendTo(cont).delay(2000).fadeIn(2000);
     
 }
 

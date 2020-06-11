@@ -45,7 +45,6 @@ class Button {
 }
 
 function startcooldown(btn, option) {
-    console.log(btn);
     var cd = btn[0]._cooldown
     
     let start = cd, left = 1;
