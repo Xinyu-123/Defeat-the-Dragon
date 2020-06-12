@@ -17217,7 +17217,6 @@ return jQuery;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getBtnFunction = getBtnFunction;
 exports.default = void 0;
 
 var app = _interopRequireWildcard(require("./app"));
@@ -17245,11 +17244,22 @@ var Button = function Button(options) {
   this._text = options.text;
   this._click_events = options.click_events;
   this._cooldown = options.cooldown;
+  this._effect_time = options.effect;
+  this._effect_color = options.color;
   this._disabled = false;
   var el = $('<div>').attr('id', this._id).attr('type', 'button').text(this._text).addClass('button').click(function () {
     if (!$(_this).hasClass('disabled')) {
       $('#' + _this._id).attr('class', 'button-disabled');
-      startcooldown($(_this));
+
+      if (_this._effect_time) {
+        startcooldown($(_this), {
+          color: _this._effect_color,
+          cooldown: _this._cooldown,
+          effect: _this._effect_time
+        });
+      } else {
+        startcooldown($(_this));
+      }
     }
   });
   this._element = el;
@@ -17266,32 +17276,52 @@ var Button = function Button(options) {
   el.append(cd); // document.getElementById('stoke-fire').setAttribute('class', 'button-disabled');
 };
 
-function startcooldown(btn, option) {
-  var cd = btn[0]._cooldown;
+function startcooldown(btn, options) {
+  var ended;
+
+  if (options && options.effect) {
+    cd = options.effect;
+    ended = false;
+  } else {
+    var cd = btn[0]._cooldown;
+    ended = true;
+  }
+
   var start = cd,
       left = 1;
   var time = start;
+
+  if (options && options.color) {
+    $('div#' + btn[0]._id + ' > div.cooldown').css('background-color', options.color);
+  } else {
+    $('div#' + btn[0]._id + ' > div.cooldown').css('background-color', '#DDDDDD');
+  }
+
   $('div#' + btn[0]._id + ' > div.cooldown').width(left * 100 + "%").animate({
     width: '0%'
   }, time * 1000, 'linear', function () {
-    clearCooldown(btn, true);
+    clearCooldown(btn, ended);
   });
   btn[0]._disabled = true;
 }
 
 function clearCooldown(btn, ended) {
   var button = $('#' + btn[0]._id);
-  btn[0]._disabled = false;
-  button.attr('class', 'button');
-}
 
-function getBtnFunction(id) {
-  if (id == 'stoke-fire') {
-    app.player._health += 25;
+  if (ended == false) {
+    startcooldown(btn);
+  } else {
+    btn[0]._disabled = false;
+    button.attr('class', 'button');
   }
+} // export function getBtnFunction(id) {
+//     console.log('here');
+//     if(id == 'stoke-fire'){
+//         app.player._health += 25;
+//     }
+//     app.updateFlame()
+// }
 
-  app.updateFlame();
-}
 
 var _default = Button;
 exports.default = _default;
@@ -17305,7 +17335,7 @@ module.exports = {
     var low = Math.floor(attack - attack * 0.1);
     var high = Math.floor(attack + attack * 0.1);
     var value = module.exports.getRandomInt(high - low);
-    value = low + value;
+    value = low + value + 1;
     return value; // switch (roll){
     //     case 0:
     //         return Math.floor(attack - (attack * 0.25));
@@ -17323,7 +17353,8 @@ module.exports = {
     //         return Math.floor(attack + (attack * 0.25));
     //         break;
     // }
-  }
+  },
+  getSpells: function getSpells() {}
 };
 },{}],"../scripts/notification.js":[function(require,module,exports) {
 "use strict";
@@ -17385,7 +17416,18 @@ module.exports = {
   att_noti: function att_noti(options) {
     return "You attacked the ".concat(options.enemy._type, " with your ").concat(options.player._weapon._name, " and did ").concat(options.attack, " damage.");
   },
-  def_noti: function def_noti() {},
+  def_noti: function def_noti(options) {
+    return "You raise your shield";
+  },
+  att_defended_noti: function att_defended_noti(options) {
+    return "You defended the attack";
+  },
+  stun_noti: function stun_noti(options) {
+    return "You stun the enemy for ".concat(options.time, " seconds");
+  },
+  spell_noti: function spell_noti(options) {
+    return "You cast ".concat(options.spell, " and deal ").concat(options.attack, " damange to the ").concat(options.enemy._type);
+  },
   battle_win_noti: function battle_win_noti(options) {
     return "You have defeated a level ".concat(options.enemy._level, " ").concat(options.enemy._type);
   },
@@ -17414,6 +17456,18 @@ module.exports = {
 
       case 'att_noti':
         return 'lightblue';
+
+      case 'spell_noti':
+        return 'lightblue';
+
+      case 'att_defended_noti':
+        return 'blue';
+
+      case 'def_noti':
+        return 'blue';
+
+      case 'stun_noti':
+        return 'yellow';
     }
 
     return 'white';
@@ -17479,6 +17533,7 @@ var Enemy = /*#__PURE__*/function (_Character) {
 
     _this = _super.call(this, options);
     _this._type = options.type;
+    _this._stunned = false;
     _this._image = _this.getEnemyImage(_this._type);
     _this._xp = _this.getEnemyXP({
       level: _this._level
@@ -17530,7 +17585,6 @@ var Enemy = /*#__PURE__*/function (_Character) {
   }, {
     key: "attack_player",
     value: function attack_player(options) {
-      console.log('here');
       console.log(_gamepage.enemy);
       var interval = _gamepage.enemy._weapon._cooldown * 1000;
       this._attack_int = setInterval(this.attack_interval, interval);
@@ -17541,21 +17595,32 @@ var Enemy = /*#__PURE__*/function (_Character) {
     value: function attack_interval(options) {
       var defence = _app.player._defence;
       var attack = _gamepage.enemy._attack + _gamepage.enemy._weapon._attack;
+      console.log(_gamepage.enemy._stunned);
       console.log('attack Interval');
       attack = Util.getAttack(attack) - defence;
-      if (attack < 0) attack = 0;
-      _app.player._health -= attack;
-      Noti.create_noti({
-        type: 'enemy_att_noti',
-        player: _app.player,
-        attack: attack,
-        enemy: _gamepage.enemy
-      });
-      console.log(_app.player);
 
-      _app.player.health_change({
-        health: _app.player._health
-      });
+      if (_app.player._defending) {
+        Noti.create_noti({
+          type: 'att_defended_noti'
+        });
+      } else if (_gamepage.enemy._stunned) {
+        console.log('here');
+        return;
+      } else {
+        if (attack < 0) attack = 0;
+        _app.player._health -= attack;
+        Noti.create_noti({
+          type: 'enemy_att_noti',
+          player: _app.player,
+          attack: attack,
+          enemy: _gamepage.enemy
+        });
+        console.log(_app.player);
+
+        _app.player.health_change({
+          health: _app.player._health
+        });
+      }
     }
   }, {
     key: "clear_attack",
@@ -17705,6 +17770,11 @@ module.exports = {
       var defence = enemy._defence;
       var attack = _player._attack + _player._weapon._attack;
       attack = Util.getAttack(attack) - defence;
+
+      if (_player._defending) {
+        attack = Math.floor(attack * 0.7);
+      }
+
       enemy._health -= attack;
       noti.create_noti({
         type: 'att_noti',
@@ -17716,9 +17786,49 @@ module.exports = {
     } else {//no enemy
     }
   },
-  defend_btn: function defend_btn(options) {},
-  stun_btn: function stun_btn() {},
-  spell_btn: function spell_btn() {},
+  defend_btn: function defend_btn() {
+    var time = page.alt_btn._effect_time;
+    app.player._defending = true;
+    noti.create_noti({
+      type: 'def_noti'
+    });
+    setTimeout(function () {
+      app.player._defending = false;
+    }, time * 1000);
+  },
+  stun_btn: function stun_btn() {
+    var time = page.alt_btn._effect_time;
+    page.enemy._stunned = true;
+    noti.create_noti({
+      type: 'stun_noti',
+      time: time
+    });
+    setTimeout(function () {
+      page.enemy._stunned = false;
+    }, time * 1000);
+  },
+  spell_btn: function spell_btn() {
+    console.log('spell');
+
+    if (page.enemy != null) {
+      var _player2 = app.player;
+
+      var spell = _player2.get_spell();
+
+      var enemy = page.enemy;
+      var attack = _player2._attack + _player2._weapon._attack;
+      attack = Util.getAttack(attack);
+      enemy._health -= attack;
+      noti.create_noti({
+        type: 'spell_noti',
+        player: _player2,
+        attack: attack,
+        spell: spell,
+        enemy: enemy
+      });
+      page.defeatEnemy(enemy);
+    }
+  },
   restart_btn: function restart_btn() {
     var grad = $('<div>').addClass('text-gradient');
     $('.text-container').children().fadeOut(1000);
@@ -17819,7 +17929,7 @@ function defeatEnemy(enemy) {
     }); //remove image element
 
     (0, _jquery.default)(enemy._element).fadeOut(1000);
-    clearInterval(enemy._attack_int);
+    enemy.clear_attack();
 
     if (enemy._type == 'dragon') {
       (0, _jquery.default)('.interaction-container').children().fadeOut(1000);
@@ -17900,6 +18010,7 @@ function updateScreen2() {
   btn.animate({
     opacity: 0
   }, 1000, 'linear', function () {
+    btn.css('display', 'block');
     setTimeout(function () {
       btn.appendTo(container);
       btn.animate({
@@ -17950,7 +18061,9 @@ function updateScreen4() {
         id: 'alt-btn',
         text: 'defend',
         click_events: [ButtonFunc.defend_btn],
-        cooldown: 4,
+        effect: 3,
+        color: 'blue',
+        cooldown: 5,
         width: 60
       });
       break;
@@ -17970,7 +18083,9 @@ function updateScreen4() {
         id: 'alt-btn',
         text: 'stun',
         click_events: [ButtonFunc.stun_btn],
-        cooldown: 6,
+        effect: 1,
+        color: 'yellow',
+        cooldown: 3,
         width: 60
       });
       break;
@@ -18053,6 +18168,8 @@ var Player = /*#__PURE__*/function (_Character) {
     _this._class = options.class;
     _this._xp_to_lvl = _this.getLevelXP(_this._level);
     _this._max_health = options.max_health;
+    _this._defending = false;
+    _this._spells = ['Thundershock', 'Fireball', 'Water Surge', 'Earthquake'];
     return _this;
   }
 
@@ -18129,14 +18246,17 @@ var Player = /*#__PURE__*/function (_Character) {
         //     container.removeChild(container.firstChild);
         // }
 
-        clearInterval(Page.enemy._attack_int);
+        Page.enemy.clear_attack(); // clearInterval(Page.enemy._attack_int);
+
         console.log($('.interaction-container').children());
         $('.interaction-container').children('img').fadeOut(1000);
         $('.battle-options-container').children().fadeOut(1000);
+        $('.items-container').children('#intro-btn').fadeOut(1000);
         Page.enemy = null;
         setTimeout(function () {
           $('.battle-options-container').empty();
-          $('.interaction-container').children('img').remove();
+          $('.interaction-container').children('img').remove(); // $('.items-container').children('#intro-btn').remove();
+
           var game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
           var try_again_btn = new _Button.default({
             id: 'alt-btn',
@@ -18159,6 +18279,12 @@ var Player = /*#__PURE__*/function (_Character) {
       if (_app.player.health > _app.player._max_health) {
         _app.player.health = _app.player._max_health;
       }
+    }
+  }, {
+    key: "get_spell",
+    value: function get_spell() {
+      var roll = Util.getRandomInt(4);
+      return this._spells[roll];
     }
   }]);
 
@@ -18384,7 +18510,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60667" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50017" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

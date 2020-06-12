@@ -62,7 +62,7 @@ export function defeatEnemy(enemy){
 
         //remove image element
         $(enemy._element).fadeOut(1000);
-        clearInterval(enemy._attack_int);
+        enemy.clear_attack();
 
         if(enemy._type == 'dragon'){
             $('.interaction-container').children().fadeOut(1000);
@@ -138,6 +138,8 @@ export function updateScreen2() {
     let flame = $('#intro-fire');
     let btn = $('#intro-btn');
     let container = $('.items-container')
+
+    
     flame.animate({opacity: 0}, 1000, 'linear', () => {
         setTimeout(() => {
             flame.appendTo(container);
@@ -147,6 +149,7 @@ export function updateScreen2() {
     })
 
     btn.animate({opacity: 0}, 1000, 'linear', () => {
+        btn.css('display', 'block');
         setTimeout(() => {
             btn.appendTo(container);
             btn.animate({opacity: 1}, 1000, 'linear')
@@ -198,7 +201,9 @@ export function updateScreen4() {
                 id: 'alt-btn',
                 text: 'defend',
                 click_events: [ButtonFunc.defend_btn],
-                cooldown: 4,
+                effect: 3,
+                color: 'blue',
+                cooldown: 5,
                 width: 60
             });
             break;
@@ -218,7 +223,9 @@ export function updateScreen4() {
                 id: 'alt-btn',
                 text: 'stun',
                 click_events: [ButtonFunc.stun_btn],
-                cooldown: 6,
+                effect: 1,
+                color: 'yellow',
+                cooldown: 3,
                 width: 60
             });
             break;

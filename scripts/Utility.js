@@ -12,7 +12,7 @@ module.exports = {
         let high = Math.floor(attack + (attack * 0.1));
 
         let value = module.exports.getRandomInt(high-low);
-        value = low + value;
+        value = low + value + 1;
 
         return value;
         // switch (roll){
@@ -34,5 +34,8 @@ module.exports = {
         // }
     },
 
+    getSpells: function(){ 
+
+    }
 
 }

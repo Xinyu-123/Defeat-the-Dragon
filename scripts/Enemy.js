@@ -14,12 +14,15 @@ export default class Enemy extends Character {
         super(options);
 
         this._type = options.type;
+        this._stunned = false;
         this._image = this.getEnemyImage(this._type);
         this._xp = this.getEnemyXP({
             level: this._level
         })
 
         this._element = $('<img>').addClass('enemy').attr('id', this._type).attr('src', this._image);
+
+        
 
 
     }
@@ -58,7 +61,6 @@ export default class Enemy extends Character {
     }
 
     attack_player(options){
-        console.log('here');
         console.log(enemy);
         let interval = enemy._weapon._cooldown * 1000;
         this._attack_int = setInterval(this.attack_interval, interval);
@@ -68,23 +70,34 @@ export default class Enemy extends Character {
     attack_interval(options){
         let defence = player._defence;
         let attack = enemy._attack + enemy._weapon._attack;
-
+        console.log(enemy._stunned)
         console.log('attack Interval')
         attack = Util.getAttack(attack) - defence;
-        if(attack < 0)
-            attack = 0;
+        if(player._defending){
+            Noti.create_noti({
+                type: 'att_defended_noti'
+            })
+        }else if(enemy._stunned){
+            console.log('here');
+            return;
+        }
+        else {
+            if(attack < 0)
+                attack = 0;
 
-        player._health -= attack;
-        Noti.create_noti({
-            type: 'enemy_att_noti',
-            player: player,
-            attack: attack,
-            enemy: enemy
-        })
+            player._health -= attack;
+            Noti.create_noti({
+                type: 'enemy_att_noti',
+                player: player,
+                attack: attack,
+                enemy: enemy
+            })
 
-        console.log(player)
-        player.health_change({health: player._health});
+            console.log(player)
+            player.health_change({health: player._health});
 
+        }
+        
         
     }
 
@@ -93,6 +106,7 @@ export default class Enemy extends Character {
         clearInterval(this._attack_int);
         
     }
+
 
     static get_enemy(){
         let level = player._level, type, info;

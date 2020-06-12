@@ -64,8 +64,20 @@ module.exports = {
         return `You attacked the ${options.enemy._type} with your ${options.player._weapon._name} and did ${options.attack} damage.`
     },
 
-    def_noti: function () {
+    def_noti: function(options){
+        return `You raise your shield`;
+    },
 
+    att_defended_noti: function(options){
+        return `You defended the attack`;
+    },
+
+    stun_noti: function (options) {
+        return `You stun the enemy for ${options.time} seconds`
+    },
+
+    spell_noti: function(options) {
+        return `You cast ${ options.spell } and deal ${ options.attack } damange to the ${options.enemy._type}`
     },
 
     battle_win_noti: function (options) {
@@ -86,6 +98,7 @@ module.exports = {
         return `${options.enemy._type} has attacked you with their ${options.enemy._weapon._name} and dealt ${options.attack} damage.`
     },
 
+
     player_death: function(){
         return "oh jeez, looks like you died :("
     },
@@ -102,8 +115,15 @@ module.exports = {
                 return 'lightgreen';
             case 'att_noti':
                 return 'lightblue';
+            case 'spell_noti':
+                return 'lightblue';
+            case 'att_defended_noti':
+                return 'blue';
+            case 'def_noti':
+                return 'blue';
+            case 'stun_noti':
+                return 'yellow';
         }
-
 
         return 'white';
     }

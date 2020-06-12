@@ -9,6 +9,8 @@ class Button {
         this._text = options.text;
         this._click_events = options.click_events;
         this._cooldown = options.cooldown;
+        this._effect_time = options.effect;
+        this._effect_color = options.color;
         this._disabled = false;
 
 
@@ -20,7 +22,16 @@ class Button {
             .click(() => {
                 if(!$(this).hasClass('disabled')) {
                     $('#' + this._id).attr('class', 'button-disabled');
-                    startcooldown($(this));
+                    if(this._effect_time){
+                        startcooldown($(this), {
+                            color: this._effect_color, 
+                            cooldown: this._cooldown, 
+                            effect: this._effect_time
+                        });
+                    }else{
+                        startcooldown($(this));
+                    }
+                    
 				}
             });
 
@@ -44,15 +55,28 @@ class Button {
 
 }
 
-function startcooldown(btn, option) {
-    var cd = btn[0]._cooldown
+function startcooldown(btn, options) {
+    let ended
+    if(options && options.effect){
+        cd = options.effect
+        ended = false;
+    }else{
+        var cd = btn[0]._cooldown
+        ended = true
+    }
+    
     
     let start = cd, left = 1;
 
     let time = start;
+    if(options && options.color){
+        $('div#' + btn[0]._id + ' > div.cooldown').css('background-color', options.color);
+    }else {
+        $('div#' + btn[0]._id + ' > div.cooldown').css('background-color', '#DDDDDD');
+    }
 
     $('div#' + btn[0]._id + ' > div.cooldown').width(left * 100 +"%").animate({width: '0%'}, time * 1000, 'linear', function() {
-        clearCooldown(btn, true);
+        clearCooldown(btn, ended);
     });
 
     
@@ -62,19 +86,23 @@ function startcooldown(btn, option) {
 
 function clearCooldown(btn, ended) {
     var button = $('#' + btn[0]._id);
-    btn[0]._disabled = false;
-    button.attr('class' , 'button');
-
-}
-
-export function getBtnFunction(id) {
-    if(id == 'stoke-fire'){
-        app.player._health += 25;
+    if(ended == false){
+        startcooldown(btn);
+    }else{
+        btn[0]._disabled = false;
+        button.attr('class' , 'button');
     }
 
-    app.updateFlame()
-
 
 }
+
+// export function getBtnFunction(id) {
+//     console.log('here');
+//     if(id == 'stoke-fire'){
+//         app.player._health += 25;
+//     }
+
+//     app.updateFlame()
+// }
 
 export default Button;

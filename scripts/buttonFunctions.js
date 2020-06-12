@@ -49,6 +49,9 @@ module.exports = {
             let defence = enemy._defence;
             let attack = player._attack + player._weapon._attack;
             attack = Util.getAttack(attack) - defence;
+            if(player._defending){
+                attack = Math.floor(attack * 0.7);
+            }
             
             enemy._health -= attack;
     
@@ -67,17 +70,62 @@ module.exports = {
 
     },
 
-    defend_btn: function(options) {
-        
+    defend_btn: function() {
+        let time = page.alt_btn._effect_time;
+
+        app.player._defending = true;
+
+        noti.create_noti({
+            type: 'def_noti'
+        })
+
+        setTimeout(() => {
+            app.player._defending = false;
+        }, time * 1000)
+
     },
 
     stun_btn: function(){
+        let time = page.alt_btn._effect_time;
+        page.enemy._stunned = true;
+
+        noti.create_noti({
+            type: 'stun_noti',
+            time: time
+        })
+        
+        setTimeout(() => {
+            page.enemy._stunned = false;
+        }, time * 1000)
+
+
 
     },
 
     spell_btn: function() {
-
+        console.log('spell');
+        if(page.enemy != null){
+            let player = app.player;
+            let spell = player.get_spell();
+            let enemy = page.enemy;
+            let attack = player._attack + player._weapon._attack;
+            attack = Util.getAttack(attack);
+            
+            enemy._health -= attack;
+    
+            noti.create_noti({
+                type: 'spell_noti',
+                player: player,
+                attack: attack,
+                spell: spell,
+                enemy: enemy
+            })
+    
+    
+            page.defeatEnemy(enemy);
+        }
     },
+    
 
     restart_btn: function(){
         let grad = $('<div>').addClass('text-gradient');

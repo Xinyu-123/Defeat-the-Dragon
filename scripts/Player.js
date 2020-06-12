@@ -19,6 +19,8 @@ class Player extends Character {
         this._class = options.class;
         this._xp_to_lvl = this.getLevelXP(this._level);
         this._max_health = options.max_health;
+        this._defending = false;
+        this._spells = ['Thundershock', 'Fireball', 'Water Surge', 'Earthquake']
     }
 
     getLevelXP(level) {
@@ -93,13 +95,15 @@ class Player extends Character {
             //     container.removeChild(container.firstChild);
             // }
 
-            clearInterval(Page.enemy._attack_int);
+            Page.enemy.clear_attack();
+            // clearInterval(Page.enemy._attack_int);
             console.log($('.interaction-container').children())
 
             $('.interaction-container').children('img').fadeOut(1000);
             
             $('.battle-options-container').children().fadeOut(1000);
             
+            $('.items-container').children('#intro-btn').fadeOut(1000)
 
 
 
@@ -108,6 +112,7 @@ class Player extends Character {
             setTimeout(() => {
                 $('.battle-options-container').empty();
                 $('.interaction-container').children('img').remove();
+                // $('.items-container').children('#intro-btn').remove();
                 let game_over = $('<img>').addClass('enemy').attr('src', 'https://pngimg.com/uploads/game_over/game_over_PNG22.png');
                 let try_again_btn = new Button({
                     id: 'alt-btn',
@@ -136,6 +141,12 @@ class Player extends Character {
             player.health = player._max_health;
         }
     }
+
+    get_spell(){
+        let roll = Util.getRandomInt(4);
+        return this._spells[roll]
+    }
+
 }
 
 
