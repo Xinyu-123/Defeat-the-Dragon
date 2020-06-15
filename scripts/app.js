@@ -10,6 +10,7 @@ let character_form = document.getElementById('character-select')
 let STOKE_COOLDOWN = 2;
 export let player;
 
+
 start_btn.addEventListener('click', () => {
     let character_class = getCharacterVal(character_form, 'class');
     let type = character_class;
@@ -19,10 +20,10 @@ start_btn.addEventListener('click', () => {
                         class: type,
                         stats: {
                             attack: 5,
-                            defence: 5
+                            defence: 5,
+                            health: 1
                         },
                         weapon: "Shortsword",
-                        health: 1,
                         level: 1,
                         max_health: 100
                          });
@@ -34,30 +35,33 @@ start_btn.addEventListener('click', () => {
 function getCharacterVal(form, name) {
     let val;
     // get list of radio buttons with specified name
-    let radios = form.elements[name];
-    // loop through list of radio buttons
-    radios.forEach(element => {
-        if(element.id == "checked")
-            val = element.value;
-    })
+    $('#character-select').find('div').each(function(){
+        if($(this).attr('id') == 'checked')
+            val = $(this).text().trim();
+    });
+
     return val; // return value of checked radio or undefined if none checked
 }
 
 
 let displaySubmit = () => {
-    let radios = character_form.elements['class'];
+    let classes = [];
+    $('#character-select').find('div').each(function(){
+        classes.push($(this));
+    });
 
-    radios.forEach(element => {
-        element.addEventListener('click', () => {
+    classes.forEach(element => {
+        element.on('click', () => {
             let otherElements = document.getElementsByName('class');
             otherElements.forEach(ele => {
                 ele.removeAttribute('id')
             })
-            element.setAttribute("id", "checked");
+            element.attr('id', "checked")
             start_btn.style.position = "initial";
             start_btn.style.right = 0;
             start_btn.style.opacity = 1;
         })
+
     });
 }
 

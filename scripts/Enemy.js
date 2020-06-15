@@ -70,15 +70,12 @@ export default class Enemy extends Character {
     attack_interval(options){
         let defence = player._defence;
         let attack = enemy._attack + enemy._weapon._attack;
-        console.log(enemy._stunned)
-        console.log('attack Interval')
         attack = Util.getAttack(attack) - defence;
         if(player._defending){
             Noti.create_noti({
                 type: 'att_defended_noti'
             })
         }else if(enemy._stunned){
-            console.log('here');
             return;
         }
         else {
@@ -102,7 +99,6 @@ export default class Enemy extends Character {
     }
 
     clear_attack(){
-        console.log('clear attack');
         clearInterval(this._attack_int);
         
     }
@@ -111,15 +107,8 @@ export default class Enemy extends Character {
     static get_enemy(){
         let level = player._level, type, info;
         if(level >= 4){
-            //spawn dragon
-            console.log('here');
-            info = {
-                type: 'dragon',
-                stats: {attack: 60, defence: 10},
-                level: level,
-                health: 5,
-                weapon: 'fists'
-            };
+            //spawn dragon;
+            info = this.get_dragon();
             
         }
         else{
@@ -127,10 +116,9 @@ export default class Enemy extends Character {
 
             info = {
                 type: type, 
-                stats: this.get_enemy_stats(), 
+                stats: this.get_enemy_stats(type, level), 
                 level: level, 
-                health: this.get_enemy_health(type, level),
-                weapon: this.get_enemy_weapon(),
+                weapon: this.get_enemy_weapon(type),
             };
     
         }
@@ -148,16 +136,70 @@ export default class Enemy extends Character {
     }
 
     static get_enemy_stats(type, level){
-        return {attack: 12, defence: 2};
+        switch (type){
+            case 'skeleton':
+                switch (level){
+                    case 1:
+                        return {attack: 15, defence: 2, health: 10}
+                    case 2:
+                        return {attack: 30, defence: 4, health: 20}
+                    case 3:
+                        return {attack: 40, defence: 8, health: 35}
+                }
+            case 'troll':
+                switch (level){
+                    case 1:
+                        return {attack: 20, defence: 2, health: 50}
+                    case 2:
+                        return {attack: 40, defence: 3, health: 70}
+                    case 3:
+                        return {attack: 60, defence: 4, health: 95}
+                }
+            case 'undead-wizard':
+                switch (level){
+                    case 1:
+                        return {attack: 30, defence: 0, health: 10}
+                    case 2:
+                        return {attack: 40, defence: 2, health: 15}
+                    case 3:                    
+                    return {attack: 45, defence: 2, health: 20}
+                }
+            case 'slime':
+                switch (level){
+                    case 1:
+                        return {attack: 12, defence: 4, health: 5}
+                    case 2:
+                        return {attack: 14, defence: 7, health: 8}
+                    case 3:                    
+                        return {attack: 20, defence: 13, health: 12}
+                }
+
+            case 'dragon':
+                return {attack: 30, defence: 10, health: 150}
+        }
     }
 
     static get_enemy_weapon(type){
-        return 'fists';
+        switch (type){
+            case 'skeleton':
+                return 'fists';
+
+            case 'troll':
+                return 'club';
+
+            case 'undead-wizard':
+                return 'staff';
+
+            case 'slime':
+                return 'glop';
+
+            case 'dragon':
+                return 'claws';
+            
+
+        }
     }
 
-    static get_enemy_health(level, type){
-        return 30;
-    }
 
     static get_dragon(){
         let level = player._level;
@@ -169,12 +211,10 @@ export default class Enemy extends Character {
 
         let info = {
             type: type, 
-            stats: this.get_enemy_stats(), 
+            stats: this.get_enemy_stats(type, level), 
             level: level, 
-            health: this.get_enemy_health(type, level),
-            weapon: this.get_enemy_weapon(),
+            weapon: this.get_enemy_weapon(type),
         };
-
         
         return info;
     }

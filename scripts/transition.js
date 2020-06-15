@@ -10,7 +10,6 @@ const app = require('./app');
 const noti = require('./notification');
 class Fade extends Highway.Transition{
     in({from, to, done}) {
-        console.log({noti});
 
         const tl = new TimelineLite();
 

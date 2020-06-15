@@ -5,7 +5,7 @@ class Character {
         this._attack = options.stats.attack;
         this._defence = options.stats.defence;
         this._weapon = new Weapon(options.weapon);
-        this._health = options.health
+        this._health = options.stats.health
         this._level = options.level;        
     }
 

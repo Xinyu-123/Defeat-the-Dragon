@@ -6,6 +6,7 @@ import {player} from './app';
 
 const page = require('./gamepage');
 const Weapon = require('./Weapons');
+const Player = require('./Player');
 const noti = require('./notification');
 const Util = require('./Utility');
 const app = require('./app');
@@ -71,34 +72,38 @@ module.exports = {
     },
 
     defend_btn: function() {
-        let time = page.alt_btn._effect_time;
+        if(page.enemy != null){
+            let time = page.alt_btn._effect_time;
 
-        app.player._defending = true;
-
-        noti.create_noti({
-            type: 'def_noti'
-        })
-
-        setTimeout(() => {
-            app.player._defending = false;
-        }, time * 1000)
+            app.player._defending = true;
+    
+            noti.create_noti({
+                type: 'def_noti'
+            })
+    
+            setTimeout(() => {
+                app.player._defending = false;
+            }, time * 1000)
+        }
 
     },
 
     stun_btn: function(){
-        let time = page.alt_btn._effect_time;
-        page.enemy._stunned = true;
-
-        noti.create_noti({
-            type: 'stun_noti',
-            time: time
-        })
-        
-        setTimeout(() => {
-            page.enemy._stunned = false;
-        }, time * 1000)
-
-
+        if(page.enemy != null){
+            let time = page.alt_btn._effect_time;
+            page.enemy._stunned = true;
+    
+            noti.create_noti({
+                type: 'stun_noti',
+                time: time
+            })
+            
+            setTimeout(() => {
+                    page.enemy._stunned = false;
+    
+            }, time * 1000)
+    
+        }
 
     },
 
@@ -128,20 +133,40 @@ module.exports = {
     
 
     restart_btn: function(){
+        let type = player._class;
         let grad = $('<div>').addClass('text-gradient');
-        $('.text-container').children().fadeOut(1000);
-        $('.interaction-container').children('img').fadeOut(1000);
-        $('.battle-options-container').fadeOut(1000);
-        setTimeout(() => {
-            $('.text-container').empty().append(grad);
-            $('.interaction-container').children('img').remove();
-            $('.battle-options-container').remove();
-        },1000)
-        
-        player._health = 100;
 
-        page.updateScreen1();
+        $('.text-container').children().fadeOut(1000, 'linear', () => {
+            $('.text-container').empty().append(grad);
+        });
+
+        $('.interaction-container').children('img').fadeOut(1000, 'linear' , () => {
+            $('.interaction-container').children('img').remove();
+        });
+
+        $('.battle-options-container').fadeOut(1000, 'linear' , () => {
+            $('.battle-options-container').remove();
+            app.player = new Player.default({
+                class: type,
+                stats: {
+                    attack: 5,
+                    defence: 5,
+                    health: 100
+                },
+                weapon: "Shortsword",
+                level: 1,
+                max_health: 100
+            });
+            
+            page.updateScreen1();
+        });
+
+        
+
+        
+        
     }
+
 
     
     

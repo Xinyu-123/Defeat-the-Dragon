@@ -20,10 +20,16 @@ export default class Weapon {
     getWeaponCooldown(name) {
         switch(name){
             case 'Shortsword':
-                return 1;
+                return 2;
             case 'fists':
                 return 3;
+            case 'claws':
+                return 2.5;
+
+            
         }
+
+        return 3;
     }
 }
 

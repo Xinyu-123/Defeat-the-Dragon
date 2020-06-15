@@ -97,7 +97,6 @@ class Player extends Character {
 
             Page.enemy.clear_attack();
             // clearInterval(Page.enemy._attack_int);
-            console.log($('.interaction-container').children())
 
             $('.interaction-container').children('img').fadeOut(1000);
             
@@ -121,12 +120,10 @@ class Player extends Character {
                     cooldown: 0,
                     width: 60
                 })
-                console.log('1');
-                $(game_over).hide().appendTo('.interaction-container').fadeIn(1000);
-                console.log('2');
-                $(try_again_btn._element).hide().appendTo('.battle-options-container').delay(500).fadeIn(2000);
 
-                console.log('3');
+                $(game_over).hide().appendTo('.interaction-container').fadeIn(1000);
+
+                $(try_again_btn._element).hide().appendTo('.battle-options-container').delay(500).fadeIn(2000);
 
             }, 1000)
             
