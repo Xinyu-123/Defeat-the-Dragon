@@ -21,7 +21,7 @@
     "@dogstudio/highway": "^2.2.1",
     "gsap": "^3.2.6",
     "jquery": "^3.5.1",
-    "jsdom": "^16.2.2"
+    "jsdom": "^16.5.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
